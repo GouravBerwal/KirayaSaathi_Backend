@@ -4,6 +4,7 @@ import logging
 import os
 import json
 import urllib.request
+import urllib.error
 import secrets
 import string
 from datetime import timedelta
@@ -249,7 +250,7 @@ def send_http_email_resend(to_email: str, subject: str, html_content: str, text_
 
 
 def send_http_email_brevo(to_email: str, subject: str, html_content: str, text_content: str = "") -> bool:
-    api_key = os.getenv("BREVO_API_KEY", "").strip()
+    api_key = os.getenv("BREVO_API_KEY", getattr(settings, "BREVO_API_KEY", "")).strip()
     if not api_key:
         return False
 
@@ -268,11 +269,23 @@ def send_http_email_brevo(to_email: str, subject: str, html_content: str, text_c
         headers={
             "api-key": api_key,
             "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=8) as resp:
+        import ssl
+        ctx = None
+        if os.path.exists("/etc/ssl/certs/ca-certificates.crt"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/certs/ca-certificates.crt")
+        elif os.path.exists("/etc/ssl/cert.pem"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
             return resp.status in (200, 201)
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="ignore") if hasattr(e, "read") else ""
+        logger.warning("Brevo HTTPS email HTTP error %s: %s", e.code, body)
+        return False
     except Exception as e:
         logger.warning("Brevo HTTPS email failed: %s", e)
         return False
@@ -280,22 +293,22 @@ def send_http_email_brevo(to_email: str, subject: str, html_content: str, text_c
 
 def send_verification_email(email: str, otp: str, username: str = "") -> tuple[bool, str]:
     """
-    Sends the OTP verification email using Resend, Brevo HTTPS API, or standard Django SMTP.
+    Sends the OTP verification email using Brevo (HTTPS), Resend (HTTPS), or standard Django SMTP.
     Returns (success: bool, method_or_error: str).
     """
     text_content, html_content = render_otp_email_templates(otp, username)
     subject = "Your KirayaSetu Verification Code"
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
 
-    # 1. Try Resend HTTPS API (Port 443 - never blocked on Render)
-    if send_http_email_resend(email, subject, html_content, text_content):
-        logger.info("OTP verification email delivered via Resend HTTPS to %s", email)
-        return True, "resend"
-
-    # 2. Try Brevo HTTPS API (Port 443 - never blocked on Render)
+    # 1. Try Brevo HTTPS API first (Sends to ANY recipient in the world via Port 443)
     if send_http_email_brevo(email, subject, html_content, text_content):
         logger.info("OTP verification email delivered via Brevo HTTPS to %s", email)
         return True, "brevo"
+
+    # 2. Try Resend HTTPS API (Port 443 - testing mode or custom domain)
+    if send_http_email_resend(email, subject, html_content, text_content):
+        logger.info("OTP verification email delivered via Resend HTTPS to %s", email)
+        return True, "resend"
 
     # 3. Try standard Django send_mail (SMTP)
     try:

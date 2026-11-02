@@ -390,8 +390,13 @@ EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 10))
 
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
-_default_from = "KirayaSaathi <onboarding@resend.dev>" if RESEND_API_KEY else (f"KirayaSaathi <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else "KirayaSaathi <kirayasaathi.support@gmail.com>")
+_default_from = (
+    f"KirayaSaathi <{EMAIL_HOST_USER}>"
+    if (BREVO_API_KEY or EMAIL_HOST_USER)
+    else ("KirayaSaathi <onboarding@resend.dev>" if RESEND_API_KEY else "KirayaSaathi <kirayasaathi.support@gmail.com>")
+)
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", _default_from)
 ALLOW_OTP_FALLBACK = env_bool("ALLOW_OTP_FALLBACK", True)
 

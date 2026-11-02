@@ -23,4 +23,5 @@ CSRF_COOKIE_SECURE = False
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 RESEND_API_KEY = ""
+BREVO_API_KEY = ""
 ALLOW_OTP_FALLBACK = False
