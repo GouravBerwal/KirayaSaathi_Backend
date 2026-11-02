@@ -207,8 +207,8 @@ def send_verification_email(email: str, otp: str, username: str = "") -> None:
     Raises an exception if email delivery fails.
     """
     text_content, html_content = render_otp_email_templates(otp, username)
-    subject = "Your KirayaSetu Verification Code"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
+    subject = "Your KirayaSaathi Verification Code"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
 
     send_mail(
         subject=subject,

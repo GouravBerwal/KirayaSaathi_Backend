@@ -372,23 +372,26 @@ SECURE_HSTS_PRELOAD = False
 
 # Ensure SSL certificate bundle is available on macOS/Linux for SMTP TLS
 if "SSL_CERT_FILE" not in os.environ:
-    for _cert_path in ["/etc/ssl/cert.pem", "/etc/pki/tls/cert.pem"]:
+    for _cert_path in ["/etc/ssl/certs/ca-certificates.crt", "/etc/ssl/cert.pem", "/etc/pki/tls/cert.pem"]:
         if os.path.exists(_cert_path):
             os.environ["SSL_CERT_FILE"] = _cert_path
             break
 
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "kirayasaathi.support@gmail.com").strip()
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "tvlybnzksxcbxbdf").replace(" ", "").strip()
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
     "django.core.mail.backends.smtp.EmailBackend"
-    if os.getenv("EMAIL_HOST_USER")
+    if EMAIL_HOST_USER
     else "django.core.mail.backends.console.EmailBackend",
 )
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "").strip()
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "").replace(" ", "").strip()
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 10))
+
+_default_from = f"KirayaSaathi <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else "KirayaSaathi <kirayasaathi.support@gmail.com>"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", _default_from)
 
 # SMS & WhatsApp Gateway Configuration (Twilio, Fast2SMS, Meta WhatsApp API)
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
