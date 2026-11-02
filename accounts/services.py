@@ -205,11 +205,17 @@ https://kirayasetu.com
 
 
 def send_http_email_resend(to_email: str, subject: str, html_content: str, text_content: str = "") -> bool:
-    api_key = os.getenv("RESEND_API_KEY", "").strip()
+    api_key = os.getenv("RESEND_API_KEY", getattr(settings, "RESEND_API_KEY", "")).strip()
     if not api_key:
         return False
 
-    from_email = os.getenv("DEFAULT_FROM_EMAIL", "KirayaSaathi <onboarding@resend.dev>")
+    from_email = os.getenv(
+        "RESEND_FROM_EMAIL",
+        os.getenv("DEFAULT_FROM_EMAIL", getattr(settings, "DEFAULT_FROM_EMAIL", "")),
+    ).strip()
+    if not from_email or "@gmail.com" in from_email.lower():
+        from_email = "KirayaSaathi <onboarding@resend.dev>"
+
     payload = json.dumps({
         "from": from_email,
         "to": [to_email],
@@ -224,11 +230,18 @@ def send_http_email_resend(to_email: str, subject: str, html_content: str, text_
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "User-Agent": "KirayaSaathi/1.0",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=8) as resp:
+        import ssl
+        ctx = None
+        if os.path.exists("/etc/ssl/certs/ca-certificates.crt"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/certs/ca-certificates.crt")
+        elif os.path.exists("/etc/ssl/cert.pem"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
             return resp.status in (200, 201)
     except Exception as e:
         logger.warning("Resend HTTPS email failed: %s", e)
