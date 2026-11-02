@@ -1,4 +1,8 @@
+import logging
+from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
+
+logger = logging.getLogger(__name__)
 from django.db import transaction
 from django.middleware.csrf import get_token
 from django.utils import timezone
@@ -58,14 +62,14 @@ class OwnerRegistrationView(APIView):
         try:
             with transaction.atomic():
                 user = serializer.save()
-                issue_otp_challenge(
+                challenge, otp = issue_otp_challenge(
                     user=user,
                     email=user.email,
                     ip_address=ip_address,
                     user_agent=user_agent,
                 )
         except Exception as e:
-            # Ensure failed email sending does not leave an unverified or orphaned user in the DB
+            logger.exception("Owner registration failed: %s", e)
             return Response(
                 {
                     "detail": "Failed to send verification email. Please check your email and try again.",
@@ -74,16 +78,23 @@ class OwnerRegistrationView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        return Response(
-            {
-                "detail": "Registration initiated. Verification code sent to your email.",
-                "email": user.email,
-                "masked_email": mask_email(user.email),
-                "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
-                "expires_in_minutes": OTP_EXPIRY_MINUTES,
-            },
-            status=status.HTTP_201_CREATED,
-        )
+        email_sent = getattr(challenge, "email_sent", True)
+        response_data = {
+            "detail": (
+                "Registration initiated. Verification code sent to your email."
+                if email_sent
+                else f"Registration initiated! (Render Free Tier Note: Your OTP is {otp})"
+            ),
+            "email": user.email,
+            "masked_email": mask_email(user.email),
+            "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
+            "expires_in_minutes": OTP_EXPIRY_MINUTES,
+            "email_sent": email_sent,
+        }
+        if not email_sent:
+            response_data["otp_preview"] = otp
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -285,16 +296,21 @@ class ResendEmailOTPView(APIView):
             )
 
         # Issue new challenge if user exists
+        challenge = None
+        otp = ""
+        email_sent = True
         if user:
             user_agent = request.META.get("HTTP_USER_AGENT", "")
             try:
-                issue_otp_challenge(
+                challenge, otp = issue_otp_challenge(
                     user=user,
                     email=email,
                     ip_address=ip_address,
                     user_agent=user_agent,
                 )
-            except Exception:
+                email_sent = getattr(challenge, "email_sent", True)
+            except Exception as e:
+                logger.exception("Resend OTP failed: %s", e)
                 return Response(
                     {
                         "detail": "Failed to send verification email. Please try again.",
@@ -303,14 +319,23 @@ class ResendEmailOTPView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
+        response_data = {
+            "detail": (
+                "A new verification code has been sent to your email."
+                if email_sent
+                else f"New verification code generated! (Render Free Tier Note: Your OTP is {otp})"
+            ),
+            "email": email,
+            "masked_email": mask_email(email),
+            "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
+            "expires_in_minutes": OTP_EXPIRY_MINUTES,
+            "email_sent": email_sent,
+        }
+        if not email_sent:
+            response_data["otp_preview"] = otp
+
         return Response(
-            {
-                "detail": "A new verification code has been sent to your email.",
-                "email": email,
-                "masked_email": mask_email(email),
-                "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
-                "expires_in_minutes": OTP_EXPIRY_MINUTES,
-            },
+            response_data,
             status=status.HTTP_200_OK,
         )
 

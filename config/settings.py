@@ -392,6 +392,7 @@ EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 10))
 
 _default_from = f"KirayaSaathi <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else "KirayaSaathi <kirayasaathi.support@gmail.com>"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", _default_from)
+ALLOW_OTP_FALLBACK = env_bool("ALLOW_OTP_FALLBACK", True)
 
 # SMS & WhatsApp Gateway Configuration (Twilio, Fast2SMS, Meta WhatsApp API)
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")

@@ -1,6 +1,9 @@
 import hmac
 import hashlib
 import logging
+import os
+import json
+import urllib.request
 import secrets
 import string
 from datetime import timedelta
@@ -201,23 +204,103 @@ https://kirayasetu.com
     return text_content, html_content
 
 
-def send_verification_email(email: str, otp: str, username: str = "") -> None:
+def send_http_email_resend(to_email: str, subject: str, html_content: str, text_content: str = "") -> bool:
+    api_key = os.getenv("RESEND_API_KEY", "").strip()
+    if not api_key:
+        return False
+
+    from_email = os.getenv("DEFAULT_FROM_EMAIL", "KirayaSaathi <onboarding@resend.dev>")
+    payload = json.dumps({
+        "from": from_email,
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content,
+        "text": text_content,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "KirayaSaathi/1.0",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            return resp.status in (200, 201)
+    except Exception as e:
+        logger.warning("Resend HTTPS email failed: %s", e)
+        return False
+
+
+def send_http_email_brevo(to_email: str, subject: str, html_content: str, text_content: str = "") -> bool:
+    api_key = os.getenv("BREVO_API_KEY", "").strip()
+    if not api_key:
+        return False
+
+    sender_email = os.getenv("EMAIL_HOST_USER", "kirayasaathi.support@gmail.com").strip()
+    payload = json.dumps({
+        "sender": {"name": "KirayaSaathi", "email": sender_email},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html_content,
+        "textContent": text_content,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.brevo.com/v3/smtp/email",
+        data=payload,
+        headers={
+            "api-key": api_key,
+            "Content-Type": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            return resp.status in (200, 201)
+    except Exception as e:
+        logger.warning("Brevo HTTPS email failed: %s", e)
+        return False
+
+
+def send_verification_email(email: str, otp: str, username: str = "") -> tuple[bool, str]:
     """
-    Sends the OTP verification email using Django's configured EMAIL_BACKEND.
-    Raises an exception if email delivery fails.
+    Sends the OTP verification email using Resend, Brevo HTTPS API, or standard Django SMTP.
+    Returns (success: bool, method_or_error: str).
     """
     text_content, html_content = render_otp_email_templates(otp, username)
-    subject = "Your KirayaSaathi Verification Code"
+    subject = "Your KirayaSetu Verification Code"
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
 
-    send_mail(
-        subject=subject,
-        message=text_content,
-        html_message=html_content,
-        from_email=from_email,
-        recipient_list=[email],
-        fail_silently=False,
-    )
+    # 1. Try Resend HTTPS API (Port 443 - never blocked on Render)
+    if send_http_email_resend(email, subject, html_content, text_content):
+        logger.info("OTP verification email delivered via Resend HTTPS to %s", email)
+        return True, "resend"
+
+    # 2. Try Brevo HTTPS API (Port 443 - never blocked on Render)
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        logger.info("OTP verification email delivered via Brevo HTTPS to %s", email)
+        return True, "brevo"
+
+    # 3. Try standard Django send_mail (SMTP)
+    try:
+        send_mail(
+            subject=subject,
+            message=text_content,
+            html_message=html_content,
+            from_email=from_email,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        logger.info("OTP verification email delivered via SMTP to %s", email)
+        return True, "smtp"
+    except Exception as e:
+        logger.warning("SMTP email delivery failed: %s", e)
+        if not getattr(settings, "ALLOW_OTP_FALLBACK", True):
+            raise
+        return False, str(e)
 
 
 def issue_otp_challenge(
@@ -255,7 +338,9 @@ def issue_otp_challenge(
     )
 
     username = user.username if user else ""
-    send_verification_email(normalized_email, otp, username=username)
+    email_sent, _ = send_verification_email(normalized_email, otp, username=username)
+    challenge.email_sent = email_sent
+    challenge.raw_otp = otp
 
     return challenge, otp
 
