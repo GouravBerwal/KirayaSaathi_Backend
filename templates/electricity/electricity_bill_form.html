@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Bills &amp; Readings | KirayaSetu</title>
+    <link rel="stylesheet" href="{% static 'css/electricity_bill_form.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        .reading-card {
+            background: #fff; border: 1px solid #CBD8E0; border-radius: 16px;
+            padding: 32px; max-width: 640px; margin: 24px auto; box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+        }
+        .form-row { margin-bottom: 20px; }
+        .form-row label { display: block; font-size: 13px; font-weight: 600; color: #142D3B; margin-bottom: 6px; }
+        .form-row input, .form-row select {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #CBD8E0; border-radius: 8px;
+            font-size: 14px; font-family: inherit; box-sizing: border-box; outline: none;
+        }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .calc-box {
+            background: #EAF4F7; padding: 16px; border-radius: 10px; margin-top: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 10.5 12 3l9 7.5V21H3z"/>
+                    <path d="M9 21v-8h6v8"/>
+                </svg>
+            </span>
+            <span class="brand-copy">
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <div class="workspace-switch">
+            <span class="avatar small-avatar">{{ current_user_initials }}</span>
+            <span>
+                <strong>{{ current_workspace_name }}</strong>
+                <small>Owner workspace</small>
+            </span>
+            <span class="switch-arrow">⌃<br>⌄</span>
+        </div>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </a>
+            <a href="{% url 'property_list' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="14" rx="2"/><path d="M9 21V3h6v18M7 11h2m-2 4h2m6-4h2m-2 4h2"/></svg>
+                Properties
+            </a>
+            <a href="{% url 'rooms' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M4 21V7l4-3 4 3v14M12 12h8v9H2"/><path d="M7 10h2m-2 4h2m-2 4h2m7-2h2"/></svg>
+                Rooms
+            </a>
+            <a href="{% url 'tenants' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M16 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 4 6"/></svg>
+                Tenants
+            </a>
+            <a href="{% url 'rent_management' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18m-4 5h3"/><path d="M7 5V3h10v2"/></svg>
+                Rent Management
+            </a>
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link active">
+                <svg viewBox="0 0 24 24"><path d="m13 2-3 8H4l7 12 3-8h6z"/></svg>
+                Electricity Bills
+            </a>
+            <a href="{% url 'invoice_list' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6M8 13h8m-8 4h8m-8-8h2"/></svg>
+                Invoices &amp; Receipts
+            </a>
+            <a href="{% url 'reports' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 3 6-8"/><path d="M7 18v-2m4 2v-6m4 6v-3m6 3V5"/></svg>
+                Reports &amp; Analytics
+            </a>
+            <a href="{% url 'notifications' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg>
+                Notifications
+                {% if unread_notifications_count > 0 %}
+                    <span class="notification-count">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'settings' %}" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M4 7h10m4 0h2M4 17h2m4 0h10M14 4v6M8 14v6"/></svg>
+                Settings
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="profile">
+                <span class="avatar">{{ current_user_initials }}</span>
+                <span class="profile-info">
+                    <strong>{{ current_user_name }}</strong>
+                    <small>Workspace owner</small>
+                </span>
+                <a href="{% url 'logout' %}" class="logout" aria-label="Log out" style="color: inherit; text-decoration: none;">⇥</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">Electricity Bills &amp; Meter Readings</div>
+            <div class="topbar-right">
+                <a href="{% url 'electricity_bill_list' %}" class="button button-secondary" style="text-decoration: none; font-size: 13px;">
+                    View All Bills →
+                </a>
+            </div>
+        </header>
+
+        <div class="page-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #035E7B; color: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="reading-card">
+                <div style="margin-bottom: 24px;">
+                    <h1 style="font-size: 22px; font-weight: 700; color: #142D3B; margin: 0;">Add Meter Reading &amp; Generate Bill</h1>
+                    <p style="color: #5A7184; font-size: 13px; margin-top: 4px;">Record consumption. The bill is automatically calculated based on the room's property tariff.</p>
+                </div>
+
+                {% if meters %}
+                    <form method="post" action="{% url 'electricity_bill_form' %}" id="elecForm">
+                        {% csrf_token %}
+
+                        <div class="form-row">
+                            <label for="meter_id">Select Room Meter <span>*</span></label>
+                            <select name="meter_id" id="meter_id" required onchange="updateRate(this)">
+                                {% for item in meters %}
+                                    <option value="{{ item.meter.id }}" data-rate="{{ item.meter.room.property.electricity_rate }}" data-prev="{{ item.latest_reading }}">
+                                        {{ item.meter.meter_number }} — {{ item.meter.room.property.name }} (Room {{ item.meter.room.room_number }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="reading_date">Reading Date <span>*</span></label>
+                            <input type="date" name="reading_date" id="reading_date" value="{{ today|date:'Y-m-d' }}" required>
+                        </div>
+
+                        <div class="form-grid-2">
+                            <div class="form-row">
+                                <label for="previous_reading">Previous Reading (kWh) <span>*</span></label>
+                                <input type="number" step="0.01" name="previous_reading" id="previous_reading" placeholder="e.g. 1000" required oninput="calcUnits()">
+                            </div>
+
+                            <div class="form-row">
+                                <label for="current_reading">Current Reading (kWh) <span>*</span></label>
+                                <input type="number" step="0.01" name="current_reading" id="current_reading" placeholder="e.g. 1120" required oninput="calcUnits()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="rate_per_unit">Rate per Unit (₹/kWh) <span>*</span></label>
+                            <input type="number" step="0.01" name="rate_per_unit" id="rate_per_unit" value="8.00" required oninput="calcUnits()">
+                        </div>
+
+                        <div class="calc-box">
+                            <div>
+                                <div style="font-size: 12px; color: #5A7184; text-transform: uppercase;">Units Consumed</div>
+                                <strong id="unitsDisplay" style="font-size: 18px; color: #142D3B;">0.00 kWh</strong>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: #5A7184; text-transform: uppercase;">Calculated Amount</div>
+                                <strong id="amountDisplay" style="font-size: 20px; color: #035E7B;">₹0.00</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                            <a href="{% url 'dashboard' %}" class="button button-secondary" style="text-decoration: none;">Cancel</a>
+                            <button type="submit" class="button button-primary">Save Reading &amp; Create Bill</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div style="text-align: center; padding: 32px; color: #5A7184;">
+                        <i class="fa-solid fa-bolt" style="font-size: 32px; margin-bottom: 12px; color: #CBD8E0;"></i>
+                        <p>No active electricity meters found in your properties. Add electricity meters to your rooms first.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function updateRate(select) {
+        if (!select || !select.options || select.selectedIndex < 0) return;
+        const option = select.options[select.selectedIndex];
+        const rate = option.getAttribute('data-rate');
+        const prev = option.getAttribute('data-prev');
+        if (rate && parseFloat(rate) > 0) {
+            document.getElementById('rate_per_unit').value = parseFloat(rate).toFixed(2);
+        }
+        if (prev !== null && prev !== undefined && prev !== '') {
+            const prevVal = parseFloat(prev).toFixed(2);
+            document.getElementById('previous_reading').value = prevVal;
+            const currEl = document.getElementById('current_reading');
+            if (!currEl.value || parseFloat(currEl.value) < parseFloat(prevVal)) {
+                currEl.value = prevVal;
+            }
+        }
+        calcUnits();
+    }
+    function calcUnits() {
+        const prev = parseFloat(document.getElementById('previous_reading').value) || 0;
+        const curr = parseFloat(document.getElementById('current_reading').value) || 0;
+        const rate = parseFloat(document.getElementById('rate_per_unit').value) || 0;
+        const units = Math.max(0, curr - prev);
+        const amount = units * rate;
+        document.getElementById('unitsDisplay').innerText = units.toFixed(2) + ' kWh';
+        document.getElementById('amountDisplay').innerText = '₹' + amount.toFixed(2);
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+        const sel = document.getElementById('meter_id');
+        if (sel) updateRate(sel);
+    });
+</script>
+
+</body>
+</html>

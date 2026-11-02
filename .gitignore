@@ -1,0 +1,35 @@
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django local files
+db.sqlite3
+media/
+staticfiles/
+
+# Cookies and session files
+cookies.txt
+
+# macOS
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
+
+# Test and coverage files
+.coverage
+htmlcov/
+.pytest_cache/

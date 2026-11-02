@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | KirayaSetu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+
+<div class="auth-card">
+    <div style="margin-bottom: 16px;">
+        <a href="{% url 'home' %}" style="color: #035E7B; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Website
+        </a>
+    </div>
+
+    <div class="brand-header">
+        <div class="brand-icon">
+            <i class="fa-solid fa-building-user"></i>
+        </div>
+        <div class="brand-name">KirayaSetu</div>
+        <div class="brand-tagline">Smart Rental Management for Every Property Owner</div>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Sign in to your owner workspace</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="form-group">
+            <label for="identifier">Username or Email</label>
+            <input type="text" id="identifier" name="identifier" class="form-input" placeholder="e.g. gurjar" value="{{ identifier|default:'' }}" required autofocus>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Sign In to Workspace
+        </button>
+    </form>
+
+    <div class="auth-footer">
+        Don't have an owner account? <a href="{% url 'register' %}">Create Account</a>
+    </div>
+</div>
+
+</body>
+</html>

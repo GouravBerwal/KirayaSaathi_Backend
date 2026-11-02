@@ -1,0 +1,438 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Property | KirayaSetu</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/edit_property.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <a href="#" class="brand">
+            <span class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 10.5 12 3l9 7.5"/>
+                    <path d="M5.5 9v11h13V9"/>
+                    <path d="M9 20v-7h6v7"/>
+                </svg>
+            </span>
+
+            <span class="brand-copy">
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <a href="{% url 'dashboard' %}" class="workspace-switcher">
+            <span class="avatar">{{ current_user_initials }}</span>
+            <span class="workspace-copy">
+                <strong>{{ current_workspace_name }}</strong>
+                <small>Owner workspace</small>
+            </span>
+            <span class="switch-icon">⌃<br>⌄</span>
+        </a>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'property_list' %}" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="8" width="18" height="13" rx="1.5"/>
+                    <path d="M7 8V4h10v4M8 12v5m4-5v5m4-5v5"/>
+                </svg>
+                <span>Properties</span>
+            </a>
+
+            <a href="{% url 'rooms' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M4 21h16M6 21V5l6-2v18m0-13 6-2v17"/>
+                    <path d="M9 8v1m0 3v1m0 3v1m6-6v1m0 3v1"/>
+                </svg>
+                <span>Rooms</span>
+            </a>
+
+            <a href="{% url 'tenants' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M2 21v-2a7 7 0 0 1 14 0v2M16 3a4 4 0 0 1 0 8m2 3a6 6 0 0 1 4 5v2"/>
+                </svg>
+                <span>Tenants</span>
+            </a>
+
+            <a href="{% url 'rent_management' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="5" width="18" height="15" rx="2"/>
+                    <path d="M3 9h18m-5 5h2"/>
+                    <path d="M7 5V3h12"/>
+                </svg>
+                <span>Rent Management</span>
+            </a>
+
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="m13 2-10 12h8l-1 8 11-13h-8z"/>
+                </svg>
+                <span>Electricity Bills</span>
+            </a>
+
+            <a href="{% url 'invoice_list' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M6 3h9l5 5v13H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                    <path d="M14 3v6h6M8 13h8m-8 4h8m-8-8h2"/>
+                </svg>
+                <span>Invoices &amp; Receipts</span>
+            </a>
+
+            <a href="{% url 'reports' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 3v18h18"/>
+                    <path d="m6 15 5-5 4 3 6-8"/>
+                    <path d="M17 5h4v4"/>
+                </svg>
+                <span>Reports &amp; Analytics</span>
+            </a>
+
+            <a href="{% url 'notifications' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                    <path d="M10 21h4"/>
+                </svg>
+                <span>Notifications</span>
+                <span class="notification-count">5</span>
+            </a>
+
+            <a href="{% url 'settings' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M4 7h9m4 0h3M4 17h3m4 0h9"/>
+                    <circle cx="15" cy="7" r="2"/>
+                    <circle cx="9" cy="17" r="2"/>
+                </svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#" class="help-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-1.2 1-1.7 1.4-1.7 3"/>
+                    <path d="M12 17h.01"/>
+                </svg>
+                <span>Help &amp; support ↗</span>
+            </a>
+
+            <div class="profile">
+                <span class="avatar">RM</span>
+                <span class="profile-copy">
+                    <strong>Rajesh Mehta</strong>
+                    <small>Workspace owner</small>
+                </span>
+                <a href="#" class="logout" aria-label="Log out">⇥</a>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- Main application -->
+    <main class="main-area">
+
+        <!-- Top navbar -->
+        <header class="topbar">
+            <div class="page-name">Properties</div>
+
+            <div class="topbar-actions">
+                <div class="global-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="m16 16 4 4"/>
+                    </svg>
+                    <span>Search anything...</span>
+                    <kbd>⌘ K</kbd>
+                </div>
+
+                <a href="#" class="icon-button notification-button" aria-label="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                        <path d="M10 21h4"/>
+                    </svg>
+                    <span class="notification-dot"></span>
+                </a>
+
+                <span class="topbar-divider"></span>
+
+                <span class="avatar top-avatar">RM</span>
+                <span class="topbar-user">Rajesh Mehta</span>
+                <span class="user-chevron">⌄</span>
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <div class="page-content">
+
+            <div class="page-heading">
+                <div>
+                    <a href="{% url 'property-detail' %}" class="breadcrumb">
+                        <span class="back-arrow">←</span>
+                        Properties / Shanti Residency / Edit
+                    </a>
+
+                    <h1>Edit {{ property.name }}</h1>
+                    <p>Keep property information and future billing preferences up to date.</p>
+                </div>
+
+                <div class="saved-status">
+                    <span>✓</span>
+                    Workspace property
+                </div>
+            </div>
+
+            <form action="{% url 'edit_property_id' property.id %}" method="post" class="content-grid">
+                {% csrf_token %}
+
+                <!-- Left form column -->
+                <section class="form-column">
+
+                    <!-- Property details -->
+                    <section class="card form-card">
+                        <div class="section-heading">
+                            <h2>Property details</h2>
+                            <p>Property ID #{{ property.id }} · Created {{ property.created_at|date:"d M Y" }}</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="property-name">Property name *</label>
+                                <input id="property-name" name="property_name" type="text" value="{{ property.name }}" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="property-type">Property type *</label>
+                                <select id="property-type" name="property_type">
+                                    <option value="BUILDING" {% if property.property_type == 'BUILDING' %}selected{% endif %}>Residential building</option>
+                                    <option value="APARTMENT" {% if property.property_type == 'APARTMENT' %}selected{% endif %}>Apartment</option>
+                                    <option value="HOSTEL" {% if property.property_type == 'HOSTEL' %}selected{% endif %}>Hostel / PG</option>
+                                    <option value="HOUSE" {% if property.property_type == 'HOUSE' %}selected{% endif %}>Independent house</option>
+                                    <option value="OTHER" {% if property.property_type == 'OTHER' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="field">
+                                <label for="owner-name">Owner / manager name *</label>
+                                <input id="owner-name" type="text" value="{{ current_user_name }}" readonly>
+                            </div>
+
+                            <div class="field">
+                                <label for="contact-number">Rent Due Day (1-28) *</label>
+                                <input id="contact-number" name="rent_due_day" type="number" min="1" max="28" value="{{ property.rent_due_day }}" required>
+                                <input id="contact-number" type="tel" value="+91 98450 12000">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Property address -->
+                    <section class="card form-card">
+                        <div class="section-heading">
+                            <h2>Property address</h2>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field full-width">
+                                <label for="street-address">Street address *</label>
+                                <input id="street-address" name="street_address" type="text" value="{{ property.address }}" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="city">City *</label>
+                                <input id="city" name="city" type="text" value="{{ property.city }}" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="state">State *</label>
+                                <input id="state" name="state" type="text" value="{{ property.state }}" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="pin-code">PIN code *</label>
+                                <input id="pin-code" name="pin_code" type="text" inputmode="numeric" value="{{ property.pin_code }}" required>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Billing preferences -->
+                    <section class="card form-card billing-card">
+                        <div class="section-heading">
+                            <h2>Default billing preferences</h2>
+                            <p>Changes apply to future bills only. Existing invoices stay unchanged.</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="monthly-rent">Monthly rent / room *</label>
+                                <div class="input-prefix">
+                                    <span>₹</span>
+                                    <input id="monthly-rent" name="monthly_rent" type="number" step="0.01" value="{{ property.monthly_rent }}" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="security-deposit">Security deposit / room *</label>
+                                <div class="input-prefix">
+                                    <span>₹</span>
+                                    <input id="security-deposit" name="security_deposit" type="number" step="0.01" value="{{ property.security_deposit }}" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="electricity-rate">Electricity rate *</label>
+                                <div class="input-suffix">
+                                    <input id="electricity-rate" name="electricity_rate" type="number" step="0.01" value="{{ property.electricity_rate }}" required>
+                                    <span>/ kWh</span>
+                                </div>
+                                <small class="field-help">Effective from the next billing cycle.</small>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Form actions -->
+                    <div class="form-actions">
+                        <p>Changes are saved securely to your database.</p>
+
+                        <div class="button-group">
+                            <a href="{% url 'property-detail' %}" class="button button-secondary">Cancel</a>
+                            <button type="submit" class="button button-primary">Save changes</button>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Right sidebar cards -->
+                <aside class="details-column">
+
+                    <!-- Property cover -->
+                    <section class="card cover-card">
+                        <h2>Property cover</h2>
+
+                        <div class="property-image">
+                            <div class="building-placeholder" aria-label="Property cover placeholder">
+                                <svg viewBox="0 0 200 130" fill="none" aria-hidden="true">
+                                    <path d="M0 102 34 76l25 20 37-46 28 29 25-18 51 41v28H0z" fill="#D7EAE7"/>
+                                    <path d="M44 119V45l57-24 57 24v74" fill="#D9E8EE" stroke="#8BA9B8" stroke-width="2"/>
+                                    <path d="M35 47h132M44 70h114M44 94h114" stroke="#8BA9B8" stroke-width="2"/>
+                                    <path d="M57 51h15v13H57zm27 0h15v13H84zm27 0h15v13h-15zm27 0h10v13h-10z" fill="#0D8AB0"/>
+                                    <path d="M57 75h15v13H57zm27 0h15v13H84zm27 0h15v13h-15zm27 0h10v13h-10z" fill="#0D8AB0"/>
+                                    <path d="M86 96h29v23H86z" fill="#035E7B"/>
+                                    <path d="M0 120h200" stroke="#8BA9B8" stroke-width="2"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="cover-actions">
+                            <a href="#" class="button button-secondary button-small">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <path d="m21 15-5-5L5 21"/>
+                                </svg>
+                                Change photo
+                            </a>
+
+                            <a href="#" class="button button-secondary button-small">Remove</a>
+                        </div>
+
+                        <p class="image-note">JPG or PNG · Up to 5 MB</p>
+                    </section>
+
+                    <!-- Property at a glance -->
+                    <section class="card glance-card">
+                        <h2>Property at a glance</h2>
+
+                        <div class="stat-line">
+                            <span>Total rooms</span>
+                            <strong>18</strong>
+                        </div>
+
+                        <div class="stat-line">
+                            <span>Occupied</span>
+                            <strong>16</strong>
+                        </div>
+
+                        <div class="stat-line">
+                            <span>Vacant</span>
+                            <strong>2</strong>
+                        </div>
+
+                        <div class="card-separator"></div>
+
+                        <p class="glance-note">
+                            To add or remove rooms, return to the property's Rooms &amp; occupancy section.
+                        </p>
+
+                        <a href="#" class="button button-secondary button-small view-property">
+                            <span class="external-icon">↗</span>
+                            View property
+                        </a>
+                    </section>
+
+                    <!-- Information notice -->
+                    <section class="info-notice">
+                        <span class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path d="M12 11v5m0-8h.01"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>Existing records are safe</strong>
+                            <p>Editing this property won't change tenant allocations, payment history or issued receipts.</p>
+                        </div>
+                    </section>
+
+                </aside>
+
+            </form>
+
+            <!-- Footer -->
+            <footer class="page-footer">
+                <span>KirayaSetu · Smart rental management for every property owner</span>
+                <span>All amounts in INR · IST</span>
+            </footer>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- Static visual toast: no JavaScript -->
+<div class="toast">
+    <span class="toast-check">✓</span>
+    <div class="toast-content">
+        <strong>Property changes saved</strong>
+        <p>Shanti Residency is up to date. Future bills will use these preferences.</p>
+    </div>
+    <span class="toast-close">×</span>
+</div>
+
+</body>
+</html>

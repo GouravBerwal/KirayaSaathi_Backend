@@ -1,0 +1,277 @@
+/*=========================================
+        TESTIMONIAL
+=========================================*/
+
+.testimonial-section{
+
+    padding:120px 0;
+
+    background:#EFF1C5;
+
+}
+
+.testimonial-card{
+
+    background:#fff;
+
+    border-radius:28px;
+
+    padding:40px;
+
+    height:100%;
+
+    transition:.35s;
+
+    border:1px solid rgba(3,94,123,.08);
+
+    box-shadow:0 15px 40px rgba(0,0,0,.05);
+
+}
+
+.testimonial-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 25px 55px rgba(3,94,123,.12);
+
+}
+
+.testimonial-top{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    margin-bottom:25px;
+
+}
+
+.testimonial-photo{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    background:#EFF7FA;
+
+    border:3px dashed var(--primary);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:34px;
+
+    color:var(--primary);
+
+    flex-shrink:0;
+
+}
+
+.testimonial-photo img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+}
+
+.testimonial-top h4{
+
+    font-size:1.3rem;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.designation{
+
+    margin:0;
+
+    color:#64748B;
+
+    font-size:.95rem;
+
+}
+
+.verified-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    background:#E7F8EE;
+
+    color:#0F9D58;
+
+    padding:5px 12px;
+
+    border-radius:30px;
+
+    font-size:.75rem;
+
+    margin-left:10px;
+
+    font-weight:600;
+
+}
+
+.stars{
+
+    color:#F59E0B;
+
+    font-size:1.25rem;
+
+    letter-spacing:3px;
+
+    margin-bottom:18px;
+
+}
+
+.testimonial-text{
+
+    color:#475569;
+
+    line-height:1.9;
+
+    font-size:1rem;
+
+    margin:0;
+
+}
+
+@media(max-width:768px){
+
+.testimonial-top{
+
+    flex-direction:column;
+
+    text-align:center;
+
+}
+
+.verified-badge{
+
+    display:block;
+
+    margin:10px auto 0;
+
+    width:max-content;
+
+}
+
+}
+.overall-rating{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:20px;
+
+margin-top:40px;
+
+margin-bottom:60px;
+
+}
+
+.rating-number{
+
+width:85px;
+
+height:85px;
+
+background:var(--primary);
+
+color:#fff;
+
+border-radius:50%;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:2rem;
+
+font-weight:700;
+
+}
+
+.rating-stars{
+
+font-size:1.4rem;
+
+color:#F59E0B;
+
+letter-spacing:3px;
+
+}
+
+.overall-rating p{
+
+margin:5px 0 0;
+
+color:#64748B;
+
+}
+.testimonial-photo{
+
+font-size:.85rem;
+
+font-weight:600;
+
+color:var(--primary);
+
+}
+.owner-badge{
+
+display:inline-block;
+
+padding:6px 14px;
+
+background:#EFF7FA;
+
+color:var(--primary);
+
+border-radius:30px;
+
+font-size:.8rem;
+
+font-weight:600;
+
+margin-top:10px;
+
+}
+.founder-reply{
+
+margin-top:25px;
+
+padding:18px;
+
+background:#EFF7FA;
+
+border-radius:14px;
+
+font-size:.92rem;
+
+color:#475569;
+
+}

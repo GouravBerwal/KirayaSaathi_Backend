@@ -1,0 +1,351 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electricity Bills - KirayaSetu</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/electricity_bill_list.css' %}">
+  <style>
+    .bills-table-container {
+      background: #ffffff;
+      border: 1px solid #dfe5e9;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 1.5rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+    .bills-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+    .bills-table th {
+      background: #f8fafc;
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      color: #64748b;
+      border-bottom: 1px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .bills-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+    }
+    .bills-table tr:hover td {
+      background: #f8fafc;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-paid { background: #dcfce7; color: #15803d; }
+    .status-pending { background: #fef3c7; color: #b45309; }
+    .status-overdue { background: #fee2e2; color: #b91c1c; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .kpi-card {
+      background: white;
+      border: 1px solid #dfe5e9;
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .kpi-card span { font-size: 0.8125rem; color: #64748b; font-weight: 500; display: block; margin-bottom: 0.5rem; }
+    .kpi-card strong { font-size: 1.5rem; color: #0f172a; font-weight: 700; }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+
+    <a href="{% url 'dashboard' %}" class="brand" style="text-decoration: none;">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 10.5 12 4l8 6.5v8.2A1.3 1.3 0 0 1 18.7 20H5.3A1.3 1.3 0 0 1 4 18.7z"/>
+          <path d="M9 20v-5.5h6V20"/>
+        </svg>
+      </div>
+
+      <div class="brand-text">
+        <div class="brand-name">KirayaSetu</div>
+        <div class="brand-sub">SMART RENTAL MANAGEMENT</div>
+      </div>
+    </a>
+
+    <div class="workspace-card">
+      <div class="avatar small">{{ request.user.username|slice:":2"|upper }}</div>
+      <div class="workspace-info">
+        <strong>{{ request.user.username|capfirst }} Properties</strong>
+        <span>Owner workspace</span>
+      </div>
+    </div>
+
+    <div class="workspace-label">WORKSPACE</div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'dashboard' %}">
+        <svg viewBox="0 0 24 24">
+          <rect x="4" y="4" width="6" height="6" rx="1"/>
+          <rect x="14" y="4" width="6" height="6" rx="1"/>
+          <rect x="4" y="14" width="6" height="6" rx="1"/>
+          <rect x="14" y="14" width="6" height="6" rx="1"/>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="{% url 'property_list' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 20V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14"/>
+          <path d="M3 20h18"/>
+          <path d="M9 8h4M9 11h4M9 14h4"/>
+        </svg>
+        <span>Properties</span>
+      </a>
+
+      <a href="{% url 'rooms' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 20V5h12v15"/>
+          <path d="M3 20h18"/>
+          <path d="M9 9h2M13 9h2M9 13h2M13 13h2"/>
+        </svg>
+        <span>Rooms</span>
+      </a>
+
+      <a href="{% url 'tenants' %}">
+        <svg viewBox="0 0 24 24">
+          <circle cx="9" cy="8" r="3"/>
+          <path d="M3.5 20c.5-3.4 2.4-5 5.5-5s5 1.6 5.5 5"/>
+          <path d="M16 6.5a3 3 0 0 1 0 5.8M17 15c2 .5 3.2 2 3.5 5"/>
+        </svg>
+        <span>Tenants</span>
+      </a>
+
+      <a href="{% url 'rent_management' %}">
+        <svg viewBox="0 0 24 24">
+          <rect x="4" y="5" width="16" height="14" rx="2"/>
+          <path d="M8 9h8M8 13h5"/>
+        </svg>
+        <span>Rent Management</span>
+      </a>
+
+      <a class="active" href="{% url 'electricity_bill_list' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="m13 2-10 12h8l-1 8 11-13h-8z"/>
+        </svg>
+        <span>Electricity Bills</span>
+      </a>
+
+      <a href="{% url 'invoice_list' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+          <path d="M14 2v6h6M8 13h8m-8 4h8m-8-8h2"/>
+        </svg>
+        <span>Invoices &amp; Receipts</span>
+      </a>
+
+      <a href="{% url 'reports' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3v18h18"/>
+          <path d="m7 14 4-4 4 3 6-8"/>
+          <path d="M17 5h4v4"/>
+        </svg>
+        <span>Reports &amp; Analytics</span>
+      </a>
+
+      <a href="{% url 'notifications' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+          <path d="M10 21h4"/>
+        </svg>
+        <span>Notifications</span>
+        {% if unread_notifications_count > 0 %}
+        <span class="count">{{ unread_notifications_count }}</span>
+        {% endif %}
+      </a>
+
+      <a href="{% url 'settings' %}">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 7h9m4 0h3M4 17h3m4 0h9"/>
+          <circle cx="15" cy="7" r="2"/>
+          <circle cx="9" cy="17" r="2"/>
+        </svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+        <span>Workspace owner</span>
+      </div>
+      <a href="{% url 'logout' %}" style="margin-left: auto; color: inherit; text-decoration: none;" title="Log out">⇥</a>
+    </div>
+
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="page-name">Electricity Bills</div>
+
+      <div class="top-actions">
+        <div class="search" onclick="document.getElementById('searchModal') && (document.getElementById('searchModal').style.display='flex')">
+          <svg viewBox="0 0 24 24">
+            <circle cx="10.5" cy="10.5" r="6"/>
+            <path d="m16 16 4 4"/>
+          </svg>
+          <span>Search anything...</span>
+          <kbd>⌘ K</kbd>
+        </div>
+
+        <a href="{% url 'notifications' %}" class="notification">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+            <path d="M10 21h4"/>
+          </svg>
+        </a>
+
+        <div class="top-divider"></div>
+
+        <div class="top-user">
+          <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+          <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- HEADING -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 700; color: #142d3b; margin-bottom: 0.25rem;">Electricity Bills &amp; Readings</h1>
+          <p class="intro" style="color: #64748b; font-size: 0.9375rem;">
+            Monitor sub-meter readings, energy consumption, and monthly billing cycles.
+          </p>
+        </div>
+
+        <a href="{% url 'electricity_bill_form' %}" class="btn-primary" style="background: #035e7b; color: white; padding: 0.75rem 1.25rem; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          + Record Meter Reading
+        </a>
+      </div>
+
+      <!-- KPI METRICS -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <span>Total Energy Consumed</span>
+          <strong>{{ total_consumption }} kWh</strong>
+        </div>
+        <div class="kpi-card">
+          <span>Total Billed</span>
+          <strong>₹{{ total_billed }}</strong>
+        </div>
+        <div class="kpi-card">
+          <span>Total Collected</span>
+          <strong style="color: #0c8067;">₹{{ total_collected }}</strong>
+        </div>
+        <div class="kpi-card">
+          <span>Pending Dues</span>
+          <strong style="color: #b45309;">₹{{ pending }}</strong>
+        </div>
+      </section>
+
+      <!-- DATA TABLE -->
+      <div class="bills-table-container">
+        <table class="bills-table">
+          <thead>
+            <tr>
+              <th>Property &amp; Room</th>
+              <th>Tenant</th>
+              <th>Meter ID</th>
+              <th>Billing Month</th>
+              <th>Readings</th>
+              <th>Units</th>
+              <th>Rate / Unit</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in bills %}
+            <tr>
+              <td>
+                <strong>{{ item.bill.meter.room.property.name }}</strong><br>
+                <small style="color: #64748b;">Room {{ item.bill.meter.room.room_number }}</small>
+              </td>
+              <td>
+                {% if item.tenant %}
+                {{ item.tenant.full_name }}
+                {% else %}
+                <span style="color: #94a3b8;">Unassigned</span>
+                {% endif %}
+              </td>
+              <td style="font-family: monospace; font-size: 0.8125rem;">
+                {{ item.bill.meter.meter_number }}
+              </td>
+              <td>{{ item.bill.billing_month|date:"M Y" }}</td>
+              <td>
+                {{ item.bill.reading.previous_reading|default:"0" }} → {{ item.bill.reading.current_reading|default:item.bill.units_consumed }}
+              </td>
+              <td>
+                <strong>{{ item.bill.units_consumed }} kWh</strong>
+              </td>
+              <td>₹{{ item.bill.rate_per_unit }}</td>
+              <td>
+                <strong>₹{{ item.bill.total_amount }}</strong>
+              </td>
+              <td>
+                <span class="status-pill {% if item.bill.status == 'PAID' %}status-paid{% elif item.bill.status == 'OVERDUE' %}status-overdue{% else %}status-pending{% endif %}">
+                  {{ item.bill.status }}
+                </span>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 3rem; color: #64748b;">
+                <p style="font-size: 1rem; margin-bottom: 0.75rem;">No electricity bills recorded yet.</p>
+                <a href="{% url 'electricity_bill_form' %}" style="color: #035e7b; font-weight: 600;">+ Record your first meter reading</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="page-footer" style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #dfe5e9; display: flex; justify-content: space-between; font-size: 0.8125rem; color: #71818e;">
+        <span>KirayaSetu · Smart rental management for every property owner</span>
+        <span>All amounts in INR · IST</span>
+      </footer>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

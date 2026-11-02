@@ -1,0 +1,495 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#EAF4F7">
+    <title>Add Property | KirayaSetu</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/add_property.css' %}">
+</head>
+
+<body>
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <a href="dashboard.html" class="brand">
+            <span class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 10 9-7 9 7"/>
+                    <path d="M5 9v12h14V9"/>
+                    <path d="M9 21v-7h6v7"/>
+                </svg>
+            </span>
+
+            <span class="brand-copy">
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <a href="{% url 'dashboard' %}" class="workspace-switcher">
+            <span class="avatar">{{ current_user_initials }}</span>
+            <span class="workspace-copy">
+                <strong>{{ current_workspace_name }}</strong>
+                <small>Owner workspace</small>
+            </span>
+            <span class="chevron">⌃⌄</span>
+        </a>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav class="navigation" aria-label="Main navigation">
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                Dashboard
+            </a>
+
+            <a href="{% url 'property_list' %}" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="8" width="18" height="13" rx="1.5"/>
+                    <path d="M7 8V4h10v4M8 12v2m4-2v2m4-2v2M8 17v4m8-4v4"/>
+                </svg>
+                Properties
+            </a>
+
+            <a href="{% url 'rooms' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 21h16M6 21V5l6-2v18M18 21V9l-6-2"/>
+                    <path d="M9 8v1m0 3v1m0 3v1m6-3v1m0 3v1"/>
+                </svg>
+                Rooms
+            </a>
+
+            <a href="{% url 'tenants' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M2 21v-2a7 7 0 0 1 14 0v2"/>
+                    <path d="M16 3.5a4 4 0 0 1 0 7.5m3 3a6 6 0 0 1 3 5.5V21"/>
+                </svg>
+                Tenants
+            </a>
+
+            <a href="{% url 'rent_management' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="15" rx="2"/>
+                    <path d="M3 9h18M16 14h2"/>
+                    <path d="M7 5V3h10v2"/>
+                </svg>
+                Rent Management
+            </a>
+
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m13 2-10 12h8l-1 8 11-13h-8z"/>
+                </svg>
+                Electricity Bills
+            </a>
+
+            <a href="{% url 'invoice_list' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                    <path d="M14 2v6h6M8 13h8m-8 4h8m-8-8h2"/>
+                </svg>
+                Invoices &amp; Receipts
+            </a>
+
+            <a href="{% url 'reports' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v18h18"/>
+                    <path d="m7 14 4-4 4 3 6-8"/>
+                    <path d="M7 18v-1m4 1v-5m4 5v-3m4 3V9"/>
+                </svg>
+                Reports &amp; Analytics
+            </a>
+
+            <a href="{% url 'notifications' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                    <path d="M10 21h4"/>
+                </svg>
+                Notifications
+                <span class="notification-count">5</span>
+            </a>
+
+            <a href="{% url 'settings' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 7h10m4 0h2M4 17h2m4 0h10"/>
+                    <circle cx="16" cy="7" r="2"/>
+                    <circle cx="8" cy="17" r="2"/>
+                </svg>
+                Settings
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#" class="help-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-1.2 1-1.7 1.4-1.7 3"/>
+                    <path d="M12 17h.01"/>
+                </svg>
+                Help &amp; support ↗
+            </a>
+
+            <div class="sidebar-user">
+                <span class="avatar">{{ current_user_initials }}</span>
+                <span class="workspace-copy">
+                    <strong>{{ current_user_name }}</strong>
+                    <small>Workspace owner</small>
+                </span>
+                <a href="{% url 'logout' %}" class="logout" aria-label="Sign out">⇥</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main area -->
+    <div class="main-area">
+
+        <!-- Top navbar -->
+        <header class="topbar">
+            <div class="topbar-title">Properties</div>
+
+            <div class="topbar-right">
+                <div class="global-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="m16 16 4 4"/>
+                    </svg>
+                    <span>Search anything...</span>
+                    <kbd>⌘ K</kbd>
+                </div>
+
+                <a href="notifications.html" class="topbar-icon" aria-label="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                        <path d="M10 21h4"/>
+                    </svg>
+                    <span class="notification-dot"></span>
+                </a>
+
+                <span class="topbar-divider"></span>
+
+                <span class="avatar">RM</span>
+
+                <a href="#" class="profile-name">
+                    Rajesh Mehta <span>⌄</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="page-content">
+
+            <div class="breadcrumb">
+                <a href="{% url 'property-detail' %}" aria-label="Back to properties">←</a>
+                <span>Properties / Add property</span>
+            </div>
+
+            <section class="page-heading">
+                <h1>Make room for your next property</h1>
+                <p>Start with the essentials. You can add rooms and tenants once the property is created.</p>
+            </section>
+
+            <!-- Three-step progress -->
+            <section class="stepper" aria-label="Property setup progress">
+
+                <div class="step active-step">
+                    <span class="step-number">1</span>
+                    <strong>Property details</strong>
+                </div>
+
+                <span class="step-line"></span>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <span>Add rooms</span>
+                </div>
+
+                <span class="step-line"></span>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <span>Allocate tenants</span>
+                </div>
+
+            </section>
+
+            <form action="{% url 'add-property' %}" method="post" class="property-form">
+                {% csrf_token %}
+
+                <div class="form-column">
+
+                    <!-- Property details -->
+                    <section class="panel">
+                        <div class="panel-heading">
+                            <h2>Property details</h2>
+                            <p>Use a name that helps you and your tenants identify the building.</p>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="property-name">Property name <span>*</span></label>
+                                <input id="property-name" name="property_name"
+                                       type="text" value="Palm Grove Residency"
+                                       placeholder="Enter property name" required>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="property-type">Property type <span>*</span></label>
+                                <select id="property-type" name="property_type" required>
+                                    <option value="BUILDING" selected>Residential Building</option>
+                                    <option value="APARTMENT">Apartment</option>
+                                    <option value="HOSTEL">Hostel</option>
+                                    <option value="PG">PG / Co-Living</option>
+                                    <option value="HOUSE">Independent House</option>
+                                    <option value="COMMERCIAL">Commercial Property</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="owner-name">Owner / manager name <span>*</span></label>
+                                <input id="owner-name" name="owner_name"
+                                       type="text" value="Rajesh Mehta"
+                                       placeholder="Enter owner name" required>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="contact-number">Contact number <span>*</span></label>
+                                <input id="contact-number" name="contact_number"
+                                       type="tel" value="+91 98450 12000"
+                                       placeholder="+91 XXXXX XXXXX" required>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Address -->
+                    <section class="panel">
+                        <div class="panel-heading">
+                            <h2>Property address</h2>
+                            <p>A complete address keeps records and tenant communication clear.</p>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-field full-width">
+                                <label for="street-address">Street address <span>*</span></label>
+                                <input id="street-address" name="street_address"
+                                       type="text" value="24, 8th Cross, Sector 2"
+                                       placeholder="Building number, street and area" required>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="locality">Locality <span>*</span></label>
+                                <input id="locality" name="locality"
+                                       type="text" value="HSR Layout"
+                                       placeholder="Enter locality" required>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="city">City <span>*</span></label>
+                                <select id="city" name="city" required>
+                                    <option value="Bengaluru" selected>Bengaluru</option>
+                                    <option value="Indore">Indore</option>
+                                    <option value="Pune">Pune</option>
+                                    <option value="Mumbai">Mumbai</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Hyderabad">Hyderabad</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="state">State <span>*</span></label>
+                                <select id="state" name="state" required>
+                                    <option value="Karnataka" selected>Karnataka</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="pin-code">PIN code <span>*</span></label>
+                                <input id="pin-code" name="pin_code"
+                                       type="text" inputmode="numeric"
+                                       maxlength="6" value="560102"
+                                       placeholder="6-digit PIN code" required>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Billing preferences -->
+                    <section class="panel">
+                        <div class="panel-heading">
+                            <h2>Default billing preferences</h2>
+                            <p>These defaults apply to new rooms. Room-level rent can be adjusted later.</p>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="monthly-rent">Monthly rent / room <span>*</span></label>
+                                <div class="input-prefix">
+                                    <span>₹</span>
+                                    <input id="monthly-rent" name="monthly_rent"
+                                           type="number" min="0" value="12000" required>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="security-deposit">Security deposit / room <span>*</span></label>
+                                <div class="input-prefix">
+                                    <span>₹</span>
+                                    <input id="security-deposit" name="security_deposit"
+                                           type="number" min="0" value="24000" required>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="rent-due-day">Rent due day <span>*</span></label>
+                                <select id="rent-due-day" name="rent_due_day" required>
+                                    <option value="1">1st of each month</option>
+                                    <option value="5" selected>5th of each month</option>
+                                    <option value="7">7th of each month</option>
+                                    <option value="10">10th of each month</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="electricity-rate">Electricity rate <span>*</span></label>
+                                <div class="input-suffix">
+                                    <input id="electricity-rate" name="electricity_rate"
+                                           type="number" min="0" step="0.01"
+                                           value="8.00" required>
+                                    <span>/ kWh</span>
+                                </div>
+                                <small class="field-help">Billed on actual meter consumption.</small>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <div class="form-actions">
+                        <p><span>*</span> Required fields</p>
+
+                        <div class="action-buttons">
+                            <a href="{% url 'property_list' %}" class="button button-secondary">Cancel</a>
+                            <button type="submit" class="button button-primary">
+                                Create property
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right-hand information column -->
+                <aside class="info-column">
+
+                    <!-- Property cover -->
+                    <section class="panel cover-panel">
+                        <div class="panel-heading">
+                            <h2>Property cover</h2>
+                            <p>Optional · Make your property easy to recognise.</p>
+                        </div>
+
+                        <label class="upload-placeholder" for="property-cover">
+                            <span class="upload-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="17" rx="2"/>
+                                    <circle cx="8.5" cy="9" r="1.5"/>
+                                    <path d="m21 15-5-5L5 21M16 3v6m-3-3h6"/>
+                                </svg>
+                            </span>
+                            <strong>Click to upload or drag a photo</strong>
+                            <small>JPG or PNG · Up to 5 MB</small>
+                            <input id="property-cover" name="property_cover"
+                                   type="file" accept="image/jpeg,image/png">
+                        </label>
+                    </section>
+
+                    <!-- Setup guidance -->
+                    <section class="panel guidance-panel">
+                        <h2>A simple start</h2>
+
+                        <span class="setup-badge">PROPERTY SETUP</span>
+
+                        <p class="guidance-description">
+                            Create the property first, then build its room inventory.
+                            No tenants or bills will be created yet.
+                        </p>
+
+                        <div class="panel-divider"></div>
+
+                        <h3>What happens next?</h3>
+
+                        <ol class="next-steps">
+                            <li>Add room numbers and floor details</li>
+                            <li>Set rent and meter information</li>
+                            <li>Allocate tenants when they move in</li>
+                        </ol>
+                    </section>
+
+                    <!-- Information note -->
+                    <section class="notice-card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M12 11v5m0-8h.01"/>
+                        </svg>
+
+                        <div>
+                            <strong>Your portfolio stays organised</strong>
+                            <p>All new properties are added to the Mehta Properties owner workspace.</p>
+                        </div>
+                    </section>
+
+                </aside>
+
+            </form>
+
+            <!-- Footer -->
+            <footer class="page-footer">
+                <span>KirayaSetu · Smart rental management for every property owner</span>
+                <span>All amounts in INR · IST</span>
+            </footer>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

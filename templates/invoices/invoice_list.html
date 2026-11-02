@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices &amp; Receipts | KirayaSetu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/invoice_list.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand" style="text-decoration: none; color: inherit;">
+            <span class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 10.5 12 3l9 7.5V21H3z"/>
+                    <path d="M9 21v-8h6v8"/>
+                </svg>
+            </span>
+            <span>
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <div class="workspace">
+            <span class="avatar">{{ current_user_initials }}</span>
+            <span class="workspace-info">
+                <strong>{{ current_workspace_name }}</strong>
+                <small>Owner workspace</small>
+            </span>
+            <span class="chevrons">⌃<br>⌄</span>
+        </div>
+
+        <p class="nav-label">WORKSPACE</p>
+
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <i class="fa-solid fa-border-all"></i> Dashboard
+            </a>
+            <a href="{% url 'property_list' %}" class="nav-item">
+                <i class="fa-solid fa-building"></i> Properties
+            </a>
+            <a href="{% url 'rooms' %}" class="nav-item">
+                <i class="fa-solid fa-door-open"></i> Rooms
+            </a>
+            <a href="{% url 'tenants' %}" class="nav-item">
+                <i class="fa-solid fa-users"></i> Tenants
+            </a>
+            <a href="{% url 'rent_management' %}" class="nav-item">
+                <i class="fa-solid fa-wallet"></i> Rent Management
+            </a>
+            <a href="{% url 'electricity_bill_form' %}" class="nav-item">
+                <i class="fa-solid fa-bolt"></i> Electricity Bills
+            </a>
+            <a href="{% url 'invoice_list' %}" class="nav-item active">
+                <i class="fa-solid fa-receipt"></i> Invoices &amp; Receipts
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item">
+                <i class="fa-solid fa-chart-column"></i> Reports &amp; Analytics
+            </a>
+            <a href="{% url 'notifications' %}" class="nav-item">
+                <i class="fa-regular fa-bell"></i> Notifications
+                {% if unread_notifications_count > 0 %}
+                    <span class="nav-badge" style="background:#035E7B; color:white; padding:2px 6px; border-radius:10px; font-size:11px;">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'settings' %}" class="nav-item">
+                <i class="fa-solid fa-gear"></i> Settings
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="profile">
+                <span class="avatar">{{ current_user_initials }}</span>
+                <span class="profile-info">
+                    <strong>{{ current_user_name }}</strong>
+                    <small>Workspace owner</small>
+                </span>
+                <a href="{% url 'logout' %}" style="text-decoration: none; color: inherit;"><span class="logout">⇥</span></a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main-area">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="page-title">Invoices &amp; Receipts</div>
+
+            <div class="topbar-right">
+                <a href="{% url 'notifications' %}" class="icon-button" style="text-decoration: none; color: inherit;">
+                    <i class="fa-regular fa-bell"></i>
+                </a>
+
+                <span class="topbar-divider"></span>
+
+                <div class="user-pill">
+                    <span class="avatar small-avatar">{{ current_user_initials }}</span>
+                    <span>{{ current_user_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+
+            <section class="invoice-workspace">
+
+                <!-- LEFT INVOICE LIST -->
+                <aside class="invoice-list-pane">
+                    <div class="list-heading">
+                        <h2>All Invoices &amp; Bills</h2>
+                        <p>{{ invoices|length }} records found</p>
+                    </div>
+
+                    <div class="invoice-scroll-list">
+                        {% if invoices %}
+                            {% for inv in invoices %}
+                                <div class="invoice-item" style="cursor: pointer;" onclick="showInvoice('{{ inv.id }}', '{{ inv.tenant_name|escapejs }}', '{{ inv.property_name|escapejs }} · Room {{ inv.room_number|escapejs }}', '₹{{ inv.amount|floatformat:2 }}', '₹{{ inv.amount_paid|floatformat:2 }}', '{{ inv.date|date:'d F Y' }}', '{{ inv.due_date|date:'d F Y' }}', '{{ inv.status }}', '{{ inv.type }}')">
+                                    <span class="invoice-item-top">
+                                        <strong>{{ inv.tenant_name }}</strong>
+                                        <span class="item-arrow">›</span>
+                                    </span>
+                                    <span class="invoice-reference">{{ inv.id }} · {{ inv.room_number }} ({{ inv.type }})</span>
+                                    <span class="invoice-item-bottom">
+                                        <strong>₹{{ inv.amount|floatformat:2 }}</strong>
+                                        <span class="status {{ inv.status|lower }}"><i></i>{{ inv.status }}</span>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="padding: 24px; text-align: center; color: #5A7184;">
+                                No invoices found. Generate rent or electricity bills to populate invoices.
+                            </div>
+                        {% endif %}
+                    </div>
+                </aside>
+
+                <!-- RIGHT INVOICE PREVIEW -->
+                <section class="invoice-preview-area">
+
+                    <div class="preview-toolbar">
+                        <span>INVOICE &amp; RECEIPT PREVIEW</span>
+                        <div class="preview-actions">
+                            <button type="button" onclick="window.print()" class="button button-secondary">
+                                <i class="fa-solid fa-print"></i> Print Receipt
+                            </button>
+                        </div>
+                    </div>
+
+                    <article class="invoice-paper" id="invoicePaper">
+                        {% if invoices %}
+                            {% with first=invoices.0 %}
+                                <header class="paper-header">
+                                    <div class="paper-brand">
+                                        <h2>KirayaSetu</h2>
+                                        <p>Issued by {{ current_workspace_name }}</p>
+                                    </div>
+
+                                    <div class="paper-invoice-number">
+                                        <h2>INVOICE</h2>
+                                        <p id="invIdDisplay">{{ first.id }}</p>
+                                        <span class="status {{ first.status|lower }}" id="invStatusDisplay"><i></i>{{ first.status }}</span>
+                                    </div>
+                                </header>
+
+                                <div class="paper-divider"></div>
+
+                                <section class="invoice-meta">
+                                    <div class="bill-to">
+                                        <span class="paper-label">BILL TO</span>
+                                        <strong id="invTenantDisplay">{{ first.tenant_name }}</strong>
+                                        <p id="invPropertyDisplay">{{ first.property_name }} · Room {{ first.room_number }}</p>
+                                    </div>
+
+                                    <div class="issue-details">
+                                        <div>
+                                            <span class="paper-label">Billing Date</span>
+                                            <strong id="invDateDisplay">{{ first.date|date:"d F Y" }}</strong>
+                                        </div>
+                                        <div>
+                                            <span class="paper-label">Due Date</span>
+                                            <strong id="invDueDisplay">{{ first.due_date|date:"d F Y" }}</strong>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <table class="invoice-table">
+                                    <thead>
+                                        <tr>
+                                            <th>DESCRIPTION</th>
+                                            <th>AMOUNT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <strong id="invDescDisplay">{{ first.type }} Bill · Room {{ first.room_number }}</strong>
+                                                <small>{{ first.property_name }}</small>
+                                            </td>
+                                            <td class="amount" id="invAmountDisplay">₹{{ first.amount|floatformat:2 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="subtotal-row">
+                                    <span>Subtotal</span>
+                                    <strong id="invSubtotalDisplay">₹{{ first.amount|floatformat:2 }}</strong>
+                                </div>
+
+                                <div class="total-row">
+                                    <strong>Total Amount Due</strong>
+                                    <strong id="invTotalDisplay">₹{{ first.amount|floatformat:2 }}</strong>
+                                </div>
+
+                                <div class="payment-line payment-success">
+                                    <span>Amount Paid</span>
+                                    <strong id="invPaidDisplay">₹{{ first.amount_paid|floatformat:2 }}</strong>
+                                </div>
+
+                                <footer class="paper-footer" style="margin-top: 32px;">
+                                    <p>{{ current_workspace_name }} · Generated with KirayaSetu Rental Management</p>
+                                </footer>
+                            {% endwith %}
+                        {% else %}
+                            <div style="padding: 48px; text-align: center; color: #5A7184;">
+                                Select an invoice to preview.
+                            </div>
+                        {% endif %}
+                    </article>
+                </section>
+            </section>
+
+            <footer class="page-footer">
+                <span>KirayaSetu · Smart rental management for every property owner</span>
+                <span>All amounts in INR · IST</span>
+            </footer>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    function showInvoice(id, tenant, propRoom, amount, paid, date, due, status, type) {
+        document.getElementById('invIdDisplay').innerText = id;
+        document.getElementById('invStatusDisplay').innerText = status;
+        document.getElementById('invTenantDisplay').innerText = tenant;
+        document.getElementById('invPropertyDisplay').innerText = propRoom;
+        document.getElementById('invDateDisplay').innerText = date;
+        document.getElementById('invDueDisplay').innerText = due;
+        document.getElementById('invDescDisplay').innerText = type + ' Bill · ' + propRoom;
+        document.getElementById('invAmountDisplay').innerText = amount;
+        document.getElementById('invSubtotalDisplay').innerText = amount;
+        document.getElementById('invTotalDisplay').innerText = amount;
+        document.getElementById('invPaidDisplay').innerText = paid;
+    }
+</script>
+
+</body>
+</html>

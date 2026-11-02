@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms | KirayaSetu</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/rooms.css' %}">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">
+                <i class="fa-solid fa-house"></i>
+            </span>
+
+            <span class="brand-text">
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <!-- Workspace Selector -->
+        <div class="workspace-selector">
+            <div class="workspace-avatar">{{ current_user_initials }}</div>
+
+            <div class="workspace-info">
+                <strong>{{ current_workspace_name }}</strong>
+                <span>Owner workspace</span>
+            </div>
+
+            <i class="fa-solid fa-angles-up-down workspace-arrow"></i>
+        </div>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <i class="fa-solid fa-border-all"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'property_list' %}" class="nav-link">
+                <i class="fa-solid fa-building"></i>
+                <span>Properties</span>
+            </a>
+
+            <a href="{% url 'rooms' %}" class="nav-link active">
+                <i class="fa-solid fa-door-open"></i>
+                <span>Rooms</span>
+            </a>
+
+            <a href="{% url 'tenants' %}" class="nav-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Tenants</span>
+            </a>
+
+            <a href="{% url 'rent_management' %}" class="nav-link">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Rent Management</span>
+            </a>
+
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Electricity Bills</span>
+            </a>
+
+            <a href="{% url 'invoice_list' %}" class="nav-link">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Invoices &amp; Receipts</span>
+            </a>
+
+            <a href="{% url 'reports' %}" class="nav-link">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Reports &amp; Analytics</span>
+            </a>
+
+            <a href="{% url 'notifications' %}" class="nav-link">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                {% if unread_notifications_count > 0 %}
+                    <span class="nav-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'settings' %}" class="nav-link">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{ current_user_initials }}</div>
+
+                <div class="user-meta">
+                    <strong>{{ current_user_name }}</strong>
+                    <span>Workspace owner</span>
+                </div>
+
+                <a href="{% url 'logout' %}" title="Sign out" style="color: inherit; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
+                </a>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-area">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="page-name">Rooms</div>
+
+            <div class="topbar-right">
+                <form method="get" action="{% url 'rooms' %}" class="global-search" style="margin: 0;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" name="q" value="{{ search_query }}" placeholder="Search room, property or tenant...">
+                    <span>Enter</span>
+                </form>
+
+                <a href="{% url 'notifications' %}" class="icon-button notification-button" style="text-decoration: none; color: inherit;">
+                    <i class="fa-regular fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                        <span class="notification-dot"></span>
+                    {% endif %}
+                </a>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+                    <div class="user-avatar">{{ current_user_initials }}</div>
+                    <span>{{ current_user_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <section class="page-content">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #035E7B; color: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- PAGE HEADING -->
+            <div class="page-heading">
+                <div class="heading-copy">
+                    <h1>A clear view of every room</h1>
+                    <p>Manage room availability, rent and allocations across your portfolio.</p>
+                </div>
+
+                <div class="heading-actions">
+                    <a href="{% url 'add_room' %}" class="button button-primary" style="text-decoration: none;">
+                        <i class="fa-solid fa-plus"></i> Add room
+                    </a>
+                </div>
+            </div>
+
+            <!-- SUMMARY CARDS -->
+            <div class="stats-grid">
+                <!-- Total Rooms -->
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Total rooms</span>
+                        <i class="fa-solid fa-door-open"></i>
+                    </div>
+                    <strong class="stat-value">{{ total_rooms }}</strong>
+                    <p class="stat-description">In your portfolio</p>
+                </article>
+
+                <!-- Occupied -->
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Occupied</span>
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <strong class="stat-value">{{ occupied_rooms }}</strong>
+                    <p class="stat-description positive-text">Current tenants</p>
+                </article>
+
+                <!-- Vacant -->
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Vacant</span>
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <strong class="stat-value">{{ vacant_rooms }}</strong>
+                    <p class="stat-description">Ready for new tenants</p>
+                </article>
+
+                <!-- Average Rent -->
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Average monthly rent</span>
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                    </div>
+                    <strong class="stat-value">₹{{ avg_rent|floatformat:2 }}</strong>
+                    <p class="stat-description">Per room</p>
+                </article>
+            </div>
+
+            <!-- ROOM INVENTORY -->
+            <section class="inventory-card">
+                <div class="inventory-heading">
+                    <h2>Room inventory</h2>
+                    <p>Your rooms, with all the essentials at a glance.</p>
+                </div>
+
+                <!-- INVENTORY TABS -->
+                <nav class="inventory-tabs" aria-label="Room status">
+                    <a href="{% url 'rooms' %}" class="inventory-tab {% if not status_filter %}active{% endif %}">
+                        All rooms · {{ total_rooms }}
+                    </a>
+                    <a href="{% url 'rooms' %}?status=OCCUPIED" class="inventory-tab {% if status_filter == 'OCCUPIED' %}active{% endif %}">
+                        Occupied · {{ occupied_rooms }}
+                    </a>
+                    <a href="{% url 'rooms' %}?status=VACANT" class="inventory-tab {% if status_filter == 'VACANT' %}active{% endif %}">
+                        Vacant · {{ vacant_rooms }}
+                    </a>
+                </nav>
+
+                <!-- TABLE TOOLBAR -->
+                <div class="inventory-toolbar">
+                    <form method="get" action="{% url 'rooms' %}" class="room-search" style="flex: 1; margin: 0;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" name="q" value="{{ search_query }}" placeholder="Search room, property or tenant...">
+                    </form>
+                </div>
+
+                <!-- ROOM TABLE -->
+                <div class="table-wrapper">
+                    <table class="room-table">
+                        <thead>
+                            <tr>
+                                <th>ROOM</th>
+                                <th>PROPERTY / TYPE</th>
+                                <th>TENANT</th>
+                                <th>MONTHLY RENT</th>
+                                <th>DEPOSIT</th>
+                                <th>OCCUPANCY</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% if rooms %}
+                                {% for item in rooms %}
+                                    <tr>
+                                        <td>
+                                            <strong class="room-number">{{ item.room.room_number }}</strong>
+                                        </td>
+
+                                        <td>
+                                            <div class="table-primary">{{ item.room.property.name }}</div>
+                                            <div class="table-secondary">{{ item.room.floor|default:"Floor" }} · {{ item.room.get_room_type_display }}</div>
+                                        </td>
+
+                                        <td>
+                                            {% if item.tenants %}
+                                                {% for t in item.tenants %}
+                                                    <div class="table-primary">{{ t.full_name }}</div>
+                                                {% endfor %}
+                                                <div class="table-secondary">{{ item.occupied_beds }}/{{ item.capacity }} beds occupied</div>
+                                            {% else %}
+                                                <div class="table-primary" style="color: #5A7184;">No tenant assigned</div>
+                                                <div class="table-secondary">Available now ({{ item.capacity }} beds)</div>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="money-cell">₹{{ item.room.monthly_rent|floatformat:2 }}</td>
+                                        <td class="money-cell">₹{{ item.room.security_deposit|floatformat:2 }}</td>
+
+                                        <td>
+                                            {% if item.room.status == 'MAINTENANCE' %}
+                                                <span class="status-badge maintenance">
+                                                    <i class="fa-solid fa-circle"></i> Maintenance
+                                                </span>
+                                            {% elif item.is_full %}
+                                                <span class="status-badge occupied">
+                                                    <i class="fa-solid fa-circle"></i> Full ({{ item.capacity }}/{{ item.capacity }})
+                                                </span>
+                                            {% elif item.occupied_beds > 0 %}
+                                                <span class="status-badge occupied" style="background: #FFF0DF; color: #A8680C;">
+                                                    <i class="fa-solid fa-circle"></i> {{ item.occupied_beds }}/{{ item.capacity }} Beds
+                                                </span>
+                                            {% else %}
+                                                <span class="status-badge vacant">
+                                                    <i class="fa-solid fa-circle"></i> Vacant
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if item.vacant_beds > 0 and item.room.status != 'MAINTENANCE' %}
+                                                <a href="{% url 'tenants' %}" class="table-action">
+                                                    Allocate <span>→</span>
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'property_detail_id' item.room.property.id %}" class="table-action">
+                                                    View
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px; color: #5A7184;">
+                                        No rooms found. <a href="{% url 'add_room' %}" style="color: #035E7B; font-weight: 600;">Click here to add your first room.</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inventory-footer">
+                    <span class="results-text">Showing {{ rooms|length }} rooms</span>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <span>KirayaSetu · Smart rental management for every property owner</span>
+                <span>All amounts in INR · IST</span>
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

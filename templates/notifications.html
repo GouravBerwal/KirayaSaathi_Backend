@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications | KirayaSetu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/notifications.css' %}" />
+</head>
+
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <a href="{% url 'dashboard' %}" class="brand" style="text-decoration: none; color: inherit;">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M5 10.5L12 5l7 5.5v8.2a1.3 1.3 0 0 1-1.3 1.3H6.3A1.3 1.3 0 0 1 5 18.7v-8.2Z"
+                stroke="currentColor" stroke-width="1.8"/>
+          <path d="M9.2 20v-5.5h5.6V20"
+                stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </div>
+
+      <div class="brand-text">
+        <div class="brand-name">KirayaSetu</div>
+        <div class="brand-subtitle">SMART RENTAL MANAGEMENT</div>
+      </div>
+    </a>
+
+    <!-- Workspace -->
+    <div class="workspace-card">
+      <div class="workspace-avatar">{{ current_user_initials }}</div>
+
+      <div class="workspace-info">
+        <strong>{{ current_workspace_name }}</strong>
+        <span>Owner workspace</span>
+      </div>
+    </div>
+
+    <div class="sidebar-label">WORKSPACE</div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <a href="{% url 'dashboard' %}" class="nav-item">
+        <i class="fa-solid fa-border-all"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="{% url 'property_list' %}" class="nav-item">
+        <i class="fa-solid fa-building"></i>
+        <span>Properties</span>
+      </a>
+
+      <a href="{% url 'rooms' %}" class="nav-item">
+        <i class="fa-solid fa-door-open"></i>
+        <span>Rooms</span>
+      </a>
+
+      <a href="{% url 'tenants' %}" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>Tenants</span>
+      </a>
+
+      <a href="{% url 'rent_management' %}" class="nav-item">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Rent Management</span>
+      </a>
+
+      <a href="{% url 'electricity_bill_form' %}" class="nav-item">
+        <i class="fa-solid fa-bolt"></i>
+        <span>Electricity Bills</span>
+      </a>
+
+      <a href="{% url 'invoice_list' %}" class="nav-item">
+        <i class="fa-solid fa-receipt"></i>
+        <span>Invoices &amp; Receipts</span>
+      </a>
+
+      <a href="{% url 'reports' %}" class="nav-item">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>Reports &amp; Analytics</span>
+      </a>
+
+      <a href="{% url 'notifications' %}" class="nav-item active">
+        <i class="fa-solid fa-bell"></i>
+        <span>Notifications</span>
+        {% if unread_notifications_count > 0 %}
+          <span class="nav-badge">{{ unread_notifications_count }}</span>
+        {% endif %}
+      </a>
+
+      <a href="{% url 'settings' %}" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="profile-card">
+        <div class="profile-avatar">{{ current_user_initials }}</div>
+        <div class="profile-info">
+          <div class="profile-name">{{ current_user_name }}</div>
+          <div class="profile-role">Workspace owner</div>
+        </div>
+        <a href="{% url 'logout' %}" class="logout-btn" title="Sign out" style="text-decoration: none; color: inherit;">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <div class="topbar-title">Notifications</div>
+
+      <div class="topbar-right">
+        <div class="topbar-profile">
+          <div class="profile-avatar-small">{{ current_user_initials }}</div>
+          <span>{{ current_user_name }}</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+
+      {% if messages %}
+        {% for message in messages %}
+          <div style="background: #035E7B; color: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Page Heading -->
+      <div class="page-heading">
+        <div>
+          <h1>A little heads-up goes a long way</h1>
+          <p>Stay a step ahead of rent, bills and important rental updates.</p>
+        </div>
+
+        <div class="heading-actions">
+          <form method="post" action="{% url 'generate_notifications' %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" class="btn primary">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              Scan &amp; Generate Reminders
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="dashboard-grid">
+
+        <!-- INBOX -->
+        <section class="inbox-card" style="grid-column: 1 / -1;">
+          <div class="inbox-header">
+            <h2>Your inbox</h2>
+            <p>{{ unread_notifications_count }} unread updates need a moment of your attention.</p>
+          </div>
+
+          <div style="padding: 16px 24px;">
+            {% if notifications %}
+              {% for n in notifications %}
+                <article class="notification-card {% if not n.is_read %}unread{% endif %}" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px; padding: 16px; border: 1px solid #EAF4F7;">
+                  <div style="display: flex; gap: 16px; align-items: flex-start;">
+                    <div class="notification-icon {% if 'OVERDUE' in n.notification_type %}warning{% else %}blue{% endif %}">
+                      <i class="fa-solid {% if 'RENT' in n.notification_type %}fa-wallet{% else %}fa-bolt{% endif %}"></i>
+                    </div>
+
+                    <div class="notification-content">
+                      <h3 style="font-size: 15px; font-weight: 700; color: #142D3B; margin-bottom: 4px;">{{ n.title }}</h3>
+                      <p style="font-size: 13px; color: #5A7184; margin-bottom: 6px;">{{ n.message }}</p>
+                      <small style="font-size: 11px; color: #8BA9B8;">
+                        Due: {{ n.due_date|date:"d M Y" }} · Amount: ₹{{ n.amount_due|floatformat:2 }} · {{ n.created_at|date:"d M Y, h:i A" }}
+                      </small>
+                    </div>
+                  </div>
+
+                  <div class="notification-right" style="display: flex; align-items: center; gap: 12px;">
+                    {% if not n.is_read %}
+                      <span class="unread-dot"></span>
+                      <a href="{% url 'mark_notification_read' n.id %}" style="font-size: 12px; color: #035E7B; font-weight: 600; text-decoration: none;">Mark read</a>
+                    {% else %}
+                      <span style="font-size: 12px; color: #8BA9B8;">Read</span>
+                    {% endif %}
+                  </div>
+                </article>
+              {% endfor %}
+            {% else %}
+              <div style="text-align: center; padding: 48px; color: #5A7184;">
+                <i class="fa-regular fa-bell" style="font-size: 32px; color: #CBD8E0; margin-bottom: 12px;"></i>
+                <h3 style="font-size: 16px; color: #142D3B; margin-bottom: 4px;">All caught up!</h3>
+                <p>No notifications at the moment. Use the button above to check for upcoming due dates.</p>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+      </div>
+
+      <footer class="page-footer">
+        <span>KirayaSetu · Smart rental management for every property owner</span>
+        <span>All amounts in INR · IST</span>
+      </footer>
+
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

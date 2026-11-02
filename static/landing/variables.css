@@ -1,0 +1,55 @@
+:root{
+
+    /* Brand Colors */
+
+    --primary:#035E7B;
+    --primary-dark:#024B63;
+    --secondary:#0D8AB0;
+    --accent:#14B8A6;
+
+    /* Status */
+
+    --success:#22C55E;
+    --warning:#F59E0B;
+    --danger:#EF4444;
+
+    /* Neutrals */
+
+    --dark:#0F172A;
+    --text:#334155;
+    --muted:#64748B;
+    --light:#F8FAFC;
+    --white:#FFFFFF;
+
+    /* Borders */
+
+    --border:#E5E7EB;
+
+    /* Glass */
+
+    --glass:rgba(255,255,255,.70);
+    --glass-border:rgba(255,255,255,.45);
+
+    /* Shadow */
+
+    --shadow:
+    0 20px 60px rgba(2,94,123,.12);
+
+    --shadow-lg:
+    0 35px 80px rgba(2,94,123,.18);
+
+    /* Radius */
+
+    --radius-sm:12px;
+    --radius-md:18px;
+    --radius-lg:28px;
+
+    /* Fonts */
+
+    --heading:'Space Grotesk',sans-serif;
+    --body:'Inter',sans-serif;
+
+    /* Transition */
+
+    --transition:.35s ease;
+}

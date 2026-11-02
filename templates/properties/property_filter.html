@@ -1,0 +1,558 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KirayaSetu - Properties</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="{% static 'css/property_filter.css' %}" />
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+
+      <div class="logo-area">
+        <div class="logo-icon">
+          <span>⌂</span>
+        </div>
+
+        <div class="logo-text">
+          <strong>KirayaSetu</strong>
+          <small>SMART RENTAL MANAGEMENT</small>
+        </div>
+      </div>
+
+      <!-- Workspace -->
+      <div class="workspace-box">
+        <div class="workspace-avatar">RM</div>
+
+        <div class="workspace-info">
+          <strong>Mehta Properties</strong>
+          <span>Owner workspace</span>
+        </div>
+
+        <span class="workspace-arrow">⌃</span>
+      </div>
+
+      <div class="sidebar-label">WORKSPACE</div>
+
+      <nav class="sidebar-nav">
+
+        <a href="{% url 'dashboard' %}">
+          <span class="nav-icon">⊞</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'property_list' %}" class="active">
+          <span class="nav-icon">▥</span>
+          <span>Properties</span>
+        </a>
+
+        <a href="{% url 'rooms' %}">
+          <span class="nav-icon">▥</span>
+          <span>Rooms</span>
+        </a>
+
+        <a href="{% url 'tenants' %}">
+          <span class="nav-icon">♧</span>
+          <span>Tenants</span>
+        </a>
+
+        <a href="{% url 'rent_management' %}">
+          <span class="nav-icon">▤</span>
+          <span>Rent Management</span>
+        </a>
+
+        <a href="{% url 'electricity_bill_form' %}">
+          <span class="nav-icon">ϟ</span>
+          <span>Electricity Bills</span>
+        </a>
+
+        <a href="{% url 'invoice_list' %}">
+          <span class="nav-icon">▧</span>
+          <span>Invoices & Receipts</span>
+        </a>
+
+        <a href="{% url 'reports' %}">
+          <span class="nav-icon">▥</span>
+          <span>Reports & Analytics</span>
+        </a>
+
+        <a href="{% url 'notifications' %}" class="notification-link">
+          <span class="nav-icon">♧</span>
+          <span>Notifications</span>
+          <b>5</b>
+        </a>
+
+        <a href="{% url 'settings' %}">
+          <span class="nav-icon">☷</span>
+          <span>Settings</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-bottom">
+
+        <a class="support">
+          <span>?</span>
+          <span>Help & support ↗</span>
+        </a>
+
+        <div class="profile">
+          <div class="profile-avatar">RM</div>
+
+          <div>
+            <strong>Rajesh Mehta</strong>
+            <span>Workspace owner</span>
+          </div>
+
+          <span class="logout">↪</span>
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+    <main class="main">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+
+        <div class="page-name">
+          Properties
+        </div>
+
+        <div class="topbar-right">
+
+          <div class="global-search">
+            <span class="search-icon">⌕</span>
+            <span>Search anything...</span>
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="notification">
+            ♧
+            <i></i>
+          </div>
+
+          <div class="top-divider"></div>
+
+          <div class="top-profile-avatar">RM</div>
+
+          <strong class="top-profile-name">
+            Rajesh Mehta
+          </strong>
+
+          <span class="top-arrow">⌄</span>
+
+        </div>
+
+      </header>
+
+
+      <!-- PAGE CONTENT -->
+      <section class="content">
+
+        <!-- HERO -->
+        <div class="hero">
+
+          <div>
+            <h1>Your properties, in one place</h1>
+
+            <p>
+              4 properties · 48 rooms · A clearer view of every address.
+            </p>
+          </div>
+
+          <div class="hero-actions">
+
+            <button class="btn secondary">
+              <span>⇩</span>
+              Export
+            </button>
+
+            <button class="btn primary">
+              <span class="plus">+</span>
+              Add property
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- SEARCH + ACTIONS -->
+        <div class="property-toolbar">
+
+          <div class="property-search">
+            <span>⌕</span>
+            <span>Search properties or locations...</span>
+          </div>
+
+          <div class="toolbar-actions">
+
+            <button class="toolbar-btn">
+              <span>⌾</span>
+              Bengaluru
+            </button>
+
+            <button class="toolbar-btn filter-btn">
+              <span>☷</span>
+              Filters · 3
+            </button>
+
+            <button class="toolbar-btn">
+              <span>⊞</span>
+              Grid view
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- FILTER CARD -->
+        <section class="filter-card">
+
+          <div class="filter-heading">
+
+            <div>
+              <h2>Refine your properties</h2>
+              <p>
+                Choose locations and availability to find the right address.
+              </p>
+            </div>
+
+            <button class="reset">
+              Reset all <span>⌃</span>
+            </button>
+
+          </div>
+
+
+          <!-- ROW 1 -->
+          <div class="filter-grid four">
+
+            <div class="field">
+              <label>City</label>
+
+              <div class="select">
+                <span>Bengaluru</span>
+                <span>⌄</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Localities</label>
+
+              <div class="select">
+                <span>HSR Layout, Indiranagar</span>
+                <span>⌄</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Availability</label>
+
+              <div class="select">
+                <span>Has vacant rooms</span>
+                <span>⌄</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Property type</label>
+
+              <div class="select">
+                <span>All types</span>
+                <span>⌄</span>
+              </div>
+            </div>
+
+          </div>
+
+
+          <!-- ROW 2 -->
+          <div class="filter-grid three">
+
+            <div class="field">
+              <label>Occupancy</label>
+
+              <div class="select">
+                <span>Any occupancy</span>
+                <span>⌄</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Minimum monthly rent</label>
+
+              <div class="input">
+                Any amount
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Maximum monthly rent</label>
+
+              <div class="input">
+                Any amount
+              </div>
+            </div>
+
+          </div>
+
+
+          <div class="filter-footer">
+
+            <p>
+              Showing properties that match all selected filters.
+            </p>
+
+            <button class="apply-btn">
+              Apply filters
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <!-- FILTER CHIPS -->
+        <div class="results-row">
+
+          <strong>2 properties found</strong>
+
+          <span class="chip">
+            Bengaluru <b>×</b>
+          </span>
+
+          <span class="chip">
+            HSR Layout + Indiranagar <b>×</b>
+          </span>
+
+          <span class="chip">
+            Has vacant rooms <b>×</b>
+          </span>
+
+          <button class="clear-filters">
+            Clear filters
+          </button>
+
+        </div>
+
+
+        <!-- PROPERTY CARDS -->
+        <div class="property-grid">
+
+          <!-- CARD 1 -->
+          <article class="property-card">
+
+            <div class="property-image placeholder">
+              <div class="placeholder-building">
+                <div class="building-main">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <div class="building-small">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-body">
+
+              <div class="property-title-row">
+
+                <div>
+                  <h2>Shanti Residency</h2>
+
+                  <p>
+                    42, 5th Main Road, HSR Layout, Bengaluru
+                  </p>
+                </div>
+
+                <button class="more">•••</button>
+
+              </div>
+
+
+              <div class="property-info">
+
+                <span>
+                  18 rooms · 16 occupied
+                </span>
+
+                <span class="vacant">
+                  ● &nbsp;2 vacant
+                </span>
+
+              </div>
+
+
+              <div class="occupancy-bar">
+                <span style="width:88.9%"></span>
+              </div>
+
+
+              <div class="property-bottom">
+
+                <div class="money">
+                  <small>RENT COLLECTED · OCT</small>
+                  <strong>₹1,74,000</strong>
+                </div>
+
+                <div class="pending">
+                  <small>PENDING</small>
+                  <strong>₹18,000</strong>
+                </div>
+
+                <button class="view-btn">
+                  ↗ &nbsp; View property
+                </button>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- CARD 2 -->
+          <article class="property-card">
+
+            <div class="property-image placeholder">
+              <div class="placeholder-building">
+                <div class="building-main">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <div class="building-small">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-body">
+
+              <div class="property-title-row">
+
+                <div>
+                  <h2>Greenview Apartments</h2>
+
+                  <p>
+                    18, 12th Cross, Indiranagar, Bengaluru
+                  </p>
+                </div>
+
+                <button class="more">•••</button>
+
+              </div>
+
+
+              <div class="property-info">
+
+                <span>
+                  12 rooms · 11 occupied
+                </span>
+
+                <span class="vacant">
+                  ● &nbsp;1 vacant
+                </span>
+
+              </div>
+
+
+              <div class="occupancy-bar">
+                <span style="width:91.7%"></span>
+              </div>
+
+
+              <div class="property-bottom">
+
+                <div class="money">
+                  <small>RENT COLLECTED · OCT</small>
+                  <strong>₹1,14,000</strong>
+                </div>
+
+                <div class="pending">
+                  <small>PENDING</small>
+                  <strong>₹18,000</strong>
+                </div>
+
+                <button class="view-btn">
+                  ↗ &nbsp; View property
+                </button>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <!-- RESULT FOOTER -->
+        <div class="result-footer">
+
+          <span>
+            Showing 2 of 4 properties · Updated today at 10:42 AM
+          </span>
+
+          <strong>
+            30 rooms · 27 occupied · 3 vacant
+          </strong>
+
+        </div>
+
+
+        <!-- PAGE FOOTER -->
+        <footer>
+
+          <span>
+            KirayaSetu · Smart rental management for every property owner
+          </span>
+
+          <span>
+            All amounts in INR · IST
+          </span>
+
+        </footer>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

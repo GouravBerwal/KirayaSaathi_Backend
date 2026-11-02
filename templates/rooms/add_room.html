@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Room | KirayaSetu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/rooms.css' %}">
+    <style>
+        .form-card-container {
+            background: white; border: 1px solid #CBD8E0; border-radius: 16px;
+            padding: 32px; max-width: 680px; margin: 24px auto;
+        }
+        .form-row { margin-bottom: 20px; }
+        .form-row label { display: block; font-size: 13px; font-weight: 600; color: #142D3B; margin-bottom: 6px; }
+        .form-row input, .form-row select {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #CBD8E0; border-radius: 8px;
+            font-size: 14px; font-family: inherit; box-sizing: border-box; outline: none;
+        }
+        .form-row input:focus, .form-row select:focus {
+            border-color: #035E7B; box-shadow: 0 0 0 3px rgba(3, 94, 123, 0.1);
+        }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .btn-submit {
+            background: #035E7B; color: white; padding: 13px 24px; border-radius: 8px;
+            border: none; font-weight: 600; font-size: 14px; cursor: pointer;
+        }
+        .btn-cancel {
+            background: #FAFCFD; color: #5A7184; padding: 13px 20px; border-radius: 8px;
+            border: 1px solid #CBD8E0; text-decoration: none; font-size: 14px; font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon"><i class="fa-solid fa-house"></i></span>
+            <span class="brand-text"><strong>KirayaSetu</strong><small>SMART RENTAL MANAGEMENT</small></span>
+        </a>
+
+        <div class="workspace-selector">
+            <div class="workspace-avatar">{{ current_user_initials }}</div>
+            <div class="workspace-info">
+                <strong>{{ current_workspace_name }}</strong>
+                <span>Owner workspace</span>
+            </div>
+            <i class="fa-solid fa-angles-up-down workspace-arrow"></i>
+        </div>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-link"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            <a href="{% url 'property_list' %}" class="nav-link"><i class="fa-solid fa-building"></i><span>Properties</span></a>
+            <a href="{% url 'rooms' %}" class="nav-link active"><i class="fa-solid fa-door-open"></i><span>Rooms</span></a>
+            <a href="{% url 'tenants' %}" class="nav-link"><i class="fa-solid fa-users"></i><span>Tenants</span></a>
+            <a href="{% url 'rent_management' %}" class="nav-link"><i class="fa-solid fa-wallet"></i><span>Rent Management</span></a>
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link"><i class="fa-solid fa-bolt"></i><span>Electricity Bills</span></a>
+            <a href="{% url 'invoice_list' %}" class="nav-link"><i class="fa-regular fa-file-lines"></i><span>Invoices &amp; Receipts</span></a>
+            <a href="{% url 'reports' %}" class="nav-link"><i class="fa-solid fa-chart-line"></i><span>Reports &amp; Analytics</span></a>
+            <a href="{% url 'notifications' %}" class="nav-link"><i class="fa-regular fa-bell"></i><span>Notifications</span></a>
+            <a href="{% url 'settings' %}" class="nav-link"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{ current_user_initials }}</div>
+                <div class="user-meta"><strong>{{ current_user_name }}</strong><span>Workspace owner</span></div>
+                <a href="{% url 'logout' %}" title="Sign out" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i></a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main-area">
+        <header class="topbar">
+            <div class="page-name">Rooms / Add Room</div>
+            <div class="topbar-right">
+                <div class="topbar-user">
+                    <div class="user-avatar">{{ current_user_initials }}</div>
+                    <span>{{ current_user_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="page-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #035E7B; color: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-card-container">
+                <div style="margin-bottom: 24px;">
+                    <a href="{% url 'rooms' %}" style="color: #035E7B; text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Rooms</a>
+                    <h1 style="font-size: 22px; font-weight: 700; color: #142D3B; margin-top: 12px;">Add New Room</h1>
+                    <p style="color: #5A7184; font-size: 13px; margin-top: 4px;">Set up room inventory and billing defaults for your property.</p>
+                </div>
+
+                <form method="post" action="{% url 'add_room' %}">
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <label for="property_id">Property <span>*</span></label>
+                        <select name="property_id" id="property_id" required>
+                            {% for p in properties %}
+                                <option value="{{ p.id }}">{{ p.name }} ({{ p.city }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-row">
+                            <label for="room_number">Room Number / Name <span>*</span></label>
+                            <input type="text" name="room_number" id="room_number" placeholder="e.g. A-101, B-204" required>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="floor">Floor / Location</label>
+                            <input type="text" name="floor" id="floor" placeholder="e.g. 1st Floor, Ground Floor" value="1st Floor">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-row">
+                            <label for="room_type">Room Type <span>*</span></label>
+                            <select name="room_type" id="room_type">
+                                <option value="SINGLE">Single Room</option>
+                                <option value="DOUBLE">Double Room</option>
+                                <option value="TRIPLE">Triple Room</option>
+                                <option value="SHARED">Shared Dorm</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="status">Initial Status <span>*</span></label>
+                            <select name="status" id="status">
+                                <option value="VACANT">Vacant (Available)</option>
+                                <option value="OCCUPIED">Occupied</option>
+                                <option value="MAINTENANCE">Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-row">
+                            <label for="monthly_rent">Monthly Rent (₹) <span>*</span></label>
+                            <input type="number" step="0.01" name="monthly_rent" id="monthly_rent" placeholder="e.g. 12000" required>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="security_deposit">Security Deposit (₹)</label>
+                            <input type="number" step="0.01" name="security_deposit" id="security_deposit" placeholder="e.g. 24000" value="0">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
+                        <a href="{% url 'rooms' %}" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">Add Room to Property</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

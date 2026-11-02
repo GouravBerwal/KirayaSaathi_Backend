@@ -1,0 +1,71 @@
+/*==========================================
+        SECURITY SECTION
+==========================================*/
+
+.security-section{
+
+    padding:120px 0;
+
+    background:#ffffff;
+
+}
+
+.security-card{
+
+    background:#F8FAFC;
+
+    border:1px solid rgba(3,94,123,.08);
+
+    border-radius:28px;
+
+    padding:40px 30px;
+
+    text-align:center;
+
+    height:100%;
+
+    transition:.35s;
+
+}
+
+.security-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 22px 45px rgba(3,94,123,.12);
+
+}
+
+.security-card img{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:contain;
+
+    margin-bottom:25px;
+
+}
+
+.security-card h4{
+
+    font-size:1.35rem;
+
+    font-weight:700;
+
+    color:#1E293B;
+
+    margin-bottom:15px;
+
+}
+
+.security-card p{
+
+    color:#64748B;
+
+    line-height:1.7;
+
+    margin:0;
+
+}

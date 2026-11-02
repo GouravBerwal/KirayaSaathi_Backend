@@ -1,0 +1,791 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Settings — KirayaSetu</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/settings.css' %}">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 10.5L12 4l8 6.5v8.2A1.3 1.3 0 0 1 18.7 20H5.3A1.3 1.3 0 0 1 4 18.7v-8.2Z"
+                stroke="currentColor" stroke-width="1.8"/>
+          <path d="M9 20v-6h6v6M8 10.5h8"
+                stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </div>
+
+      <div class="brand-text">
+        <div class="brand-name">KirayaSetu</div>
+        <div class="brand-subtitle">SMART RENTAL MANAGEMENT</div>
+      </div>
+    </div>
+
+
+    <!-- Workspace selector -->
+    <div class="workspace-box">
+
+      <div class="workspace-avatar">RM</div>
+
+      <div class="workspace-info">
+        <strong>Mehta Properties</strong>
+        <span>Owner workspace</span>
+      </div>
+
+      <svg class="workspace-chevron" viewBox="0 0 24 24" fill="none">
+        <path d="M8 10l4-4 4 4M8 14l4 4 4-4"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+      </svg>
+
+    </div>
+
+
+    <div class="sidebar-label">WORKSPACE</div>
+
+
+    <!-- Navigation -->
+    <nav class="nav">
+
+      <a href="{% url 'dashboard' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="4" width="6" height="6" rx="1"
+                stroke="currentColor" stroke-width="1.7"/>
+          <rect x="14" y="4" width="6" height="6" rx="1"
+                stroke="currentColor" stroke-width="1.7"/>
+          <rect x="4" y="14" width="6" height="6" rx="1"
+                stroke="currentColor" stroke-width="1.7"/>
+          <rect x="14" y="14" width="6" height="6" rx="1"
+                stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+
+      <a href="{% url 'property_list' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M5 20V8l7-4 7 4v12"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linejoin="round"/>
+          <path d="M9 20v-5h6v5M8 9h2M14 9h2M8 12h2M14 12h2"
+                stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+        <span>Properties</span>
+      </a>
+
+
+      <a href="{% url 'rooms' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7 20V6h10v14M4 20h16"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round"/>
+          <path d="M10 9h4M10 12h4M10 15h4"
+                stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+        <span>Rooms</span>
+      </a>
+
+
+      <a href="{% url 'tenants' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="9" cy="8" r="3"
+                  stroke="currentColor" stroke-width="1.7"/>
+          <path d="M3.5 20c.5-3.5 2.3-5.5 5.5-5.5s5 2 5.5 5.5"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round"/>
+          <path d="M16 6.5a3 3 0 0 1 0 5.8M16 14.5c2.5.4 4 2.1 4.5 4.5"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round"/>
+        </svg>
+        <span>Tenants</span>
+      </a>
+
+
+      <a href="{% url 'rent_management' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="6" width="16" height="13"
+                rx="2"
+                stroke="currentColor" stroke-width="1.7"/>
+          <path d="M4 10h16M8 6V4h8v2"
+                stroke="currentColor" stroke-width="1.7"/>
+          <path d="M15 14h2"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round"/>
+        </svg>
+        <span>Rent Management</span>
+      </a>
+
+
+      <a href="{% url 'electricity_bill_form' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M13 2L5 13h6l-1 9 8-12h-6l1-8Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"/>
+        </svg>
+        <span>Electricity Bills</span>
+      </a>
+
+
+      <a href="{% url 'invoice_list' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 3h9l4 4v14H6V3Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"/>
+          <path d="M14 3v5h5M9 12h6M9 16h6"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"/>
+        </svg>
+        <span>Invoices &amp; Receipts</span>
+      </a>
+
+
+      <a href="{% url 'reports' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 19V5M4 19h16"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"/>
+          <path d="M7 15l4-4 3 2 5-7"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+        </svg>
+        <span>Reports &amp; Analytics</span>
+      </a>
+
+
+      <a href="{% url 'notifications' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"/>
+          <path d="M10 21h4"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"/>
+        </svg>
+        <span>Notifications</span>
+        <span class="notification-count">5</span>
+      </a>
+
+
+      <a href="{% url 'settings' %}" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7h10M18 7h2M4 17h3M11 17h9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"/>
+          <circle cx="16" cy="7" r="2"
+                  stroke="currentColor" stroke-width="1.7"/>
+          <circle cx="9" cy="17" r="2"
+                  stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+        <span>Settings</span>
+      </a>
+
+    </nav>
+
+
+    <!-- Bottom sidebar -->
+    <div class="sidebar-bottom">
+
+      <a class="support-link" href="#">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8"
+                  stroke="currentColor" stroke-width="1.7"/>
+          <path d="M9.8 9.5a2.3 2.3 0 1 1 3.9 1.6c-.9.8-1.7 1.1-1.7 2.4"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round"/>
+          <circle cx="12" cy="16.5" r=".8" fill="currentColor"/>
+        </svg>
+        <span>Help &amp; support ↗</span>
+      </a>
+
+
+      <div class="sidebar-user">
+
+        <div class="user-avatar">RM</div>
+
+        <div class="user-details">
+          <strong>Rajesh Mehta</strong>
+          <span>Workspace owner</span>
+        </div>
+
+        <svg class="logout-icon" viewBox="0 0 24 24" fill="none">
+          <path d="M10 5H5v14h5M15 8l4 4-4 4M10 12h9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+        </svg>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <!-- Header -->
+    <header class="topbar">
+
+      <div class="page-name">Settings</div>
+
+      <div class="topbar-right">
+
+        <div class="global-search">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="10.8" cy="10.8" r="5.8"
+                    stroke="currentColor"
+                    stroke-width="1.7"/>
+            <path d="m15.2 15.2 4 4"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"/>
+          </svg>
+
+          <span>Search anything...</span>
+          <kbd>⌘ K</kbd>
+        </div>
+
+
+        <button class="bell-button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"/>
+            <path d="M10 21h4"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"/>
+          </svg>
+          <i></i>
+        </button>
+
+
+        <div class="header-divider"></div>
+
+
+        <div class="header-user">
+          <div class="header-avatar">RM</div>
+
+          <span>Rajesh Mehta</span>
+
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="m7 9 5 5 5-5"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- ================= PAGE CONTENT ================= -->
+    <section class="content">
+
+      <!-- Heading -->
+      <div class="page-heading">
+
+        <div>
+          <h1>Make yourself at home</h1>
+          <p>Your profile, workspace and rental preferences, all in one place.</p>
+        </div>
+
+        <div class="heading-actions">
+          <button class="btn btn-outline">Discard changes</button>
+          <button class="btn btn-primary">
+            <span>✓</span>
+            Save changes
+          </button>
+        </div>
+
+      </div>
+
+
+      <!-- Main grid -->
+      <div class="settings-grid">
+
+
+        <!-- ================= LEFT COLUMN ================= -->
+        <div class="left-column">
+
+
+          <!-- Owner profile -->
+          <section class="card owner-card">
+
+            <div class="card-header">
+              <h2>Owner profile</h2>
+              <p>The person behind your properties.</p>
+            </div>
+
+
+            <div class="profile-upload">
+
+              <div class="large-avatar">RM</div>
+
+              <div class="upload-details">
+
+                <button class="upload-btn">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 16V4M8 8l4-4 4 4"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                    <path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"/>
+                  </svg>
+                  Change photo
+                </button>
+
+                <span>JPG or PNG · Up to 5 MB</span>
+
+              </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+              <div class="field">
+                <label>Full name *</label>
+                <input type="text" value="{{ current_user_name }}" readonly>
+              </div>
+
+              <div class="field">
+                <label>Username *</label>
+                <input type="text" value="{{ request.user.username }}" readonly>
+              </div>
+
+              <div class="field full">
+                <label>Email address *</label>
+                <input type="email" value="{{ request.user.email }}" readonly>
+                <small>Billing updates and workspace summaries are sent here.</small>
+              </div>
+
+              <div class="field full">
+                <label>Workspace name</label>
+                <input type="text" value="{{ current_workspace_name }}" readonly>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- Workspace preferences -->
+          <section class="card workspace-card">
+
+            <div class="card-header">
+              <h2>Workspace preferences</h2>
+              <p>A familiar format for your day-to-day work.</p>
+            </div>
+
+
+            <div class="form-grid">
+
+              <div class="field">
+                <label>Workspace name *</label>
+                <input type="text" value="Mehta Properties">
+              </div>
+
+              <div class="field">
+                <label>Language</label>
+                <div class="select-wrap">
+                  <select>
+                    <option>English (India)</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+
+              <div class="field">
+                <label>Currency</label>
+                <div class="select-wrap">
+                  <select>
+                    <option>INR · Indian Rupee (₹)</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+
+              <div class="field">
+                <label>Time zone</label>
+                <div class="select-wrap">
+                  <select>
+                    <option>Asia/Kolkata · IST (UTC+05:30)</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+
+              <div class="field">
+                <label>Date format</label>
+                <div class="select-wrap">
+                  <select>
+                    <option>DD MMM YYYY</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+
+              <div class="field">
+                <label>Financial year</label>
+                <div class="select-wrap">
+                  <select>
+                    <option>April – March</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- Notification preferences -->
+          <section class="card notification-card">
+
+            <div class="card-header">
+              <h2>Notification preferences</h2>
+            </div>
+
+
+            <div class="preference-list">
+
+              <div class="preference-row">
+
+                <div>
+                  <strong>WhatsApp reminders</strong>
+                  <p>Allow rent and electricity reminders to registered tenant numbers.</p>
+                </div>
+
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span></span>
+                </label>
+
+              </div>
+
+
+              <div class="preference-row">
+
+                <div>
+                  <strong>Weekly portfolio summary</strong>
+                  <p>Receive an email every Monday at 9:00 AM IST.</p>
+                </div>
+
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span></span>
+                </label>
+
+              </div>
+
+
+              <div class="preference-row">
+
+                <div>
+                  <strong>Product updates</strong>
+                  <p>Occasional news about improvements to KirayaSetu.</p>
+                </div>
+
+                <label class="switch">
+                  <input type="checkbox">
+                  <span></span>
+                </label>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+
+        <!-- ================= RIGHT COLUMN ================= -->
+        <div class="right-column">
+
+
+          <!-- Property defaults -->
+          <section class="card property-defaults">
+
+            <div class="card-header">
+              <h2>Property defaults</h2>
+              <p>A starting point for newly added properties.</p>
+            </div>
+
+
+            <div class="single-fields">
+
+              <div class="field">
+                <label>Rent due day</label>
+
+                <div class="select-wrap">
+                  <select>
+                    <option>5th of each month</option>
+                  </select>
+
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+
+              <div class="field">
+                <label>Electricity rate (₹ / kWh)</label>
+                <input type="text" value="8.00">
+              </div>
+
+
+              <div class="field">
+                <label>Security deposit</label>
+
+                <div class="select-wrap">
+                  <select>
+                    <option>2 months' rent</option>
+                  </select>
+
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+
+              <div class="field">
+                <label>Reminder timing</label>
+
+                <div class="select-wrap">
+                  <select>
+                    <option>3 days before due date</option>
+                  </select>
+
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m7 9 5 5 5-5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+            </div>
+
+
+            <p class="helper-text">
+              Existing properties keep their individual preferences.
+              Change them from the property details page.
+            </p>
+
+          </section>
+
+
+          <!-- Account security -->
+          <section class="card security-card">
+
+            <div class="card-header">
+              <h2>Account security</h2>
+            </div>
+
+
+            <div class="security-status">
+
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 3l7 3v5c0 4.6-2.9 8.3-7 10-4.1-1.7-7-5.4-7-10V6l7-3Z"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linejoin="round"/>
+                <path d="m9 12 2 2 4-4"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+              </svg>
+
+              <strong>Your account is protected</strong>
+
+            </div>
+
+
+            <div class="security-info">
+              <span>Password last updated</span>
+              <strong>02 September 2026</strong>
+            </div>
+
+
+            <button class="password-btn">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="10" width="14" height="10" rx="2"
+                      stroke="currentColor"
+                      stroke-width="1.7"/>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"
+                      stroke="currentColor"
+                      stroke-width="1.7"/>
+                <path d="M12 14v2"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"/>
+              </svg>
+
+              Change password
+            </button>
+
+
+            <div class="two-factor">
+
+              <div>
+                <strong>Two-step verification</strong>
+                <p>An extra layer of account protection.</p>
+              </div>
+
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span></span>
+              </label>
+
+            </div>
+
+          </section>
+
+
+          <!-- Info -->
+          <div class="info-box">
+
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8"
+                      stroke="currentColor"
+                      stroke-width="1.7"/>
+              <path d="M12 10v5"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"/>
+              <circle cx="12" cy="7.5" r=".8"
+                      fill="currentColor"/>
+            </svg>
+
+            <div>
+              <strong>Only you can change these settings</strong>
+              <p>
+                You're signed in as the workspace owner.
+                Preferences are saved across all your devices.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Bottom save bar -->
+      <div class="bottom-save">
+
+        <span>Changes apply to your workspace after you save.</span>
+
+        <div>
+          <button class="btn btn-outline">Cancel</button>
+          <button class="btn btn-primary">Save changes</button>
+        </div>
+
+      </div>
+
+
+      <!-- Footer -->
+      <footer class="footer">
+
+        <span>KirayaSetu · Smart rental management for every property owner</span>
+
+        <span>All amounts in INR · IST</span>
+
+      </footer>
+
+    </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>

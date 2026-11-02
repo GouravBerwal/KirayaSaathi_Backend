@@ -1,0 +1,1655 @@
+/* =========================================
+   KIRAYASETU — TENANT PROFILE
+   HTML + CSS only
+   ========================================= */
+
+:root {
+    --primary: #035E7B;
+    --primary-dark: #024D65;
+    --text: #142D3B;
+    --muted: #71869A;
+    --background: #EAF4F7;
+    --main-background: #F4F8FB;
+    --accent-blue: #0D8AB0;
+    --accent-teal: #14B8A6;
+    --success: #0C8067;
+    --success-bg: #E8F8F4;
+    --border: #E5E7EB;
+    --white: #FFFFFF;
+    --soft-blue: #EAF4F7;
+    --warning: #A8680C;
+    --warning-bg: #FFF6E8;
+    --card-radius: 12px;
+    --sidebar-width: 219px;
+    --topbar-height: 69px;
+    --shadow: 0 2px 5px rgba(20, 45, 59, 0.025);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+}
+
+body {
+    margin: 0;
+    background: var(--main-background);
+    color: var(--text);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.app-layout {
+    min-height: 100vh;
+}
+
+/* =========================================
+   SIDEBAR
+   ========================================= */
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-width);
+    padding: 20px 14px 12px;
+    overflow-y: auto;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 43px;
+    margin: 3px 7px 18px;
+}
+
+.brand-icon {
+    display: grid;
+    place-items: center;
+    width: 33px;
+    height: 33px;
+    color: var(--white);
+    background: var(--primary);
+    border-radius: 8px;
+}
+
+.brand-icon svg {
+    width: 23px;
+    height: 23px;
+}
+
+.brand-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.brand-copy strong {
+    color: var(--primary);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.8px;
+}
+
+.brand-copy small {
+    margin-top: 1px;
+    color: var(--muted);
+    font-size: 8px;
+    line-height: 1.3;
+    white-space: nowrap;
+    letter-spacing: 0.1px;
+}
+
+.workspace-switcher {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 52px;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    transition: background 0.2s ease;
+}
+
+.workspace-switcher:hover {
+    background: var(--main-background);
+}
+
+.workspace-avatar,
+.topbar-avatar {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    color: var(--primary);
+    background: var(--background);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.workspace-copy,
+.sidebar-user-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.workspace-copy strong,
+.sidebar-user-copy strong {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.workspace-copy small,
+.sidebar-user-copy small {
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.switch-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+}
+
+.sidebar-label {
+    margin: 26px 12px 12px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 39px;
+    padding: 9px 11px;
+    color: #687E91;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.nav-item > svg {
+    width: 17px;
+    height: 17px;
+}
+
+.nav-item:hover {
+    color: var(--primary);
+    background: #F3F8FA;
+}
+
+.nav-item.active {
+    color: var(--primary);
+    background: var(--background);
+    font-weight: 600;
+}
+
+.notification-count {
+    display: grid;
+    place-items: center;
+    min-width: 19px;
+    height: 19px;
+    margin-left: auto;
+    padding: 0 5px;
+    color: var(--success);
+    background: var(--success-bg);
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-top: auto;
+    padding-top: 28px;
+}
+
+.help-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.help-link svg {
+    width: 17px;
+    height: 17px;
+}
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 1px;
+}
+
+.sidebar-user .workspace-avatar {
+    width: 34px;
+    height: 34px;
+}
+
+.logout-icon {
+    width: 17px;
+    height: 17px;
+    color: var(--muted);
+}
+
+/* =========================================
+   MAIN AREA AND TOPBAR
+   ========================================= */
+
+.main-area {
+    min-width: 0;
+    min-height: 100vh;
+    margin-left: var(--sidebar-width);
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--topbar-height);
+    padding: 0 25px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar-page-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 19px;
+}
+
+.global-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 238px;
+    height: 36px;
+    padding: 0 11px;
+    color: var(--muted);
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.global-search svg {
+    width: 17px;
+    height: 17px;
+}
+
+.global-search span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.global-search kbd {
+    margin-left: auto;
+    font-family: inherit;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.topbar-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    color: var(--text);
+}
+
+.topbar-icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 27px;
+    background: var(--border);
+}
+
+.topbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.topbar-avatar {
+    width: 33px;
+    height: 33px;
+}
+
+.topbar-profile > svg {
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+}
+
+/* =========================================
+   PAGE CONTENT
+   ========================================= */
+
+.page-content {
+    width: 100%;
+    max-width: 1700px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 25px 27px 17px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.breadcrumb a {
+    display: grid;
+    place-items: center;
+    color: var(--primary);
+}
+
+.breadcrumb svg {
+    width: 17px;
+    height: 17px;
+}
+
+.page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.page-heading h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(23px, 2vw, 26px);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.7px;
+}
+
+.page-heading p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.heading-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 9px;
+}
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 37px;
+    padding: 9px 13px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.button:active {
+    transform: translateY(1px);
+}
+
+.button-primary {
+    color: var(--white);
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.button-primary:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.button-secondary {
+    color: var(--primary);
+    background: var(--white);
+    border-color: var(--border);
+}
+
+.button-secondary:hover {
+    background: #F5FAFC;
+    border-color: #CBDDE4;
+}
+
+/* =========================================
+   COMMON CARD STYLES
+   ========================================= */
+
+.card {
+    min-width: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow);
+}
+
+.section-title {
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.section-subtitle {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* =========================================
+   TENANT SUMMARY
+   ========================================= */
+
+.tenant-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 97px;
+    margin-bottom: 21px;
+    padding: 18px 20px;
+}
+
+.tenant-identity {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    min-width: 0;
+}
+
+.tenant-photo {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    color: var(--primary);
+    background: var(--background);
+    border-radius: 50%;
+}
+
+.tenant-photo svg {
+    width: 39px;
+    height: 39px;
+}
+
+.tenant-identity-copy {
+    min-width: 0;
+}
+
+.tenant-identity-copy h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+}
+
+.tenant-identity-copy p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.tenant-summary-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 17px;
+}
+
+/* =========================================
+   STATUS BADGES
+   ========================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 20px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+.status-active,
+.status-occupied,
+.status-paid {
+    color: var(--success);
+    background: var(--success-bg);
+}
+
+/* =========================================
+   STATISTIC CARDS
+   ========================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 13px;
+    margin-bottom: 21px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 123px;
+    padding: 16px 17px 14px;
+}
+
+.stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.stat-top svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-blue);
+}
+
+.stat-value {
+    margin-top: 12px;
+    color: var(--text);
+    font-size: clamp(22px, 2.2vw, 26px);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.9px;
+    white-space: nowrap;
+}
+
+.stat-note {
+    margin: auto 0 0;
+    padding-top: 10px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.stat-note.note-success {
+    color: var(--success);
+}
+
+/* =========================================
+   MAIN DETAILS GRID
+   ========================================= */
+
+.details-grid {
+    display: grid;
+    grid-template-columns: minmax(245px, 0.72fr) minmax(0, 1.7fr);
+    align-items: start;
+    gap: 17px;
+}
+
+.left-column,
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+    min-width: 0;
+}
+
+/* =========================================
+   CONTACT INFORMATION
+   ========================================= */
+
+.contact-card {
+    padding: 19px 18px 17px;
+}
+
+.contact-card .section-title {
+    margin-bottom: 17px;
+}
+
+.contact-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 17px;
+}
+
+.field-label {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.field-value {
+    display: block;
+    margin: 0;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+a.field-value:hover {
+    color: var(--primary);
+}
+
+.contact-separator {
+    height: 1px;
+    margin: 1px 0 17px;
+    background: var(--border);
+}
+
+.contact-card .contact-field:last-of-type {
+    margin-bottom: 10px;
+}
+
+.contact-phone {
+    display: inline-block;
+    color: var(--accent-blue);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.contact-phone:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* =========================================
+   DOCUMENTS
+   ========================================= */
+
+.documents-card {
+    padding: 18px 18px 15px;
+}
+
+.documents-card .section-heading {
+    margin-bottom: 17px;
+}
+
+.document-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 8px 0;
+}
+
+.document-row + .document-row {
+    margin-top: 3px;
+}
+
+.document-icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    color: var(--primary);
+}
+
+.document-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.document-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.document-name {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.document-name:hover {
+    color: var(--primary);
+}
+
+.document-meta {
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.download-icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 25px;
+    height: 28px;
+    color: var(--primary);
+    border-radius: 5px;
+}
+
+.download-icon:hover {
+    background: var(--background);
+}
+
+.download-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* =========================================
+   ALLOCATED ROOM
+   ========================================= */
+
+.allocated-room-card {
+    padding: 19px 18px 17px;
+}
+
+.allocated-room-card > .section-title {
+    margin-bottom: 17px;
+}
+
+.room-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.room-heading > div {
+    min-width: 0;
+}
+
+.room-heading h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.25px;
+}
+
+.room-subtitle {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.room-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 17px;
+}
+
+.room-meta-grid > div {
+    min-width: 0;
+}
+
+.room-meta-grid .field-value {
+    margin-top: 4px;
+}
+
+.property-address-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding-top: 1px;
+}
+
+.property-address-row p {
+    margin: 0;
+    text-align: right;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* =========================================
+   PAYMENT HISTORY
+   ========================================= */
+
+.payment-card {
+    padding: 19px 18px 16px;
+}
+
+.payment-card .section-heading {
+    margin-bottom: 13px;
+}
+
+.history-tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 22px;
+    min-height: 34px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: thin;
+}
+
+.history-tab {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 0 10px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.history-tab:hover {
+    color: var(--primary);
+}
+
+.history-tab.selected {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.history-tab.selected::after {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: var(--accent-blue);
+    content: "";
+}
+
+/* Table */
+
+.table-wrap {
+    width: 100%;
+    margin-top: 17px;
+    overflow-x: auto;
+    scrollbar-color: #C8D9E0 transparent;
+    scrollbar-width: thin;
+}
+
+.payment-table {
+    width: 100%;
+    min-width: 610px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.payment-table thead {
+    background: #F7F9FB;
+}
+
+.payment-table th {
+    height: 37px;
+    padding: 10px 9px;
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.payment-table th:first-child {
+    padding-left: 13px;
+    border-radius: 6px 0 0 6px;
+}
+
+.payment-table th:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.payment-table td {
+    height: 57px;
+    padding: 12px 9px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.payment-table td:first-child {
+    padding-left: 13px;
+    font-weight: 500;
+}
+
+.payment-table tbody tr:last-child td {
+    border-bottom: 1px solid var(--border);
+}
+
+.payment-table tbody tr:hover {
+    background: #FAFCFD;
+}
+
+.payment-table .status-badge {
+    min-height: 19px;
+    padding: 3px 8px;
+    font-size: 9px;
+}
+
+.receipt-link {
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.receipt-link:hover {
+    text-decoration: underline;
+}
+
+.payment-footer {
+    margin-top: 17px;
+    color: var(--muted);
+    font-size: 9px;
+}
+
+/* =========================================
+   PAGE FOOTER
+   ========================================= */
+
+.page-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 44px;
+    padding: 0 0 2px;
+    color: var(--muted);
+    font-size: 9px;
+}
+
+/* =========================================
+   FOCUS ACCESSIBILITY
+   ========================================= */
+
+a:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* =========================================
+   LARGE SCREENS
+   ========================================= */
+
+@media (min-width: 1600px) {
+    .page-content {
+        padding-right: 34px;
+        padding-left: 34px;
+    }
+
+    .details-grid {
+        grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1.7fr);
+    }
+
+    .stat-card {
+        min-height: 130px;
+        padding: 18px 20px;
+    }
+
+    .payment-table td {
+        height: 60px;
+    }
+}
+
+/* =========================================
+   TABLETS
+   ========================================= */
+
+@media (max-width: 1100px) {
+    :root {
+        --sidebar-width: 195px;
+    }
+
+    .sidebar {
+        padding-right: 11px;
+        padding-left: 11px;
+    }
+
+    .brand {
+        margin-right: 2px;
+        margin-left: 2px;
+    }
+
+    .brand-copy strong {
+        font-size: 19px;
+    }
+
+    .page-content {
+        padding: 23px 20px 16px;
+    }
+
+    .topbar {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .topbar-actions {
+        gap: 13px;
+    }
+
+    .global-search {
+        width: 200px;
+    }
+
+    .details-grid {
+        grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.55fr);
+        gap: 13px;
+    }
+
+    .left-column,
+    .right-column {
+        gap: 13px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat-card {
+        min-height: 115px;
+    }
+
+    .tenant-summary {
+        align-items: flex-start;
+    }
+
+    .tenant-summary-actions {
+        gap: 10px;
+    }
+
+    .tenant-summary-actions .button {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .room-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .property-address-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .property-address-row p {
+        text-align: left;
+    }
+}
+
+/* =========================================
+   SMALL TABLETS AND LARGE PHONES
+   ========================================= */
+
+@media (max-width: 760px) {
+    :root {
+        --sidebar-width: 68px;
+        --topbar-height: 62px;
+    }
+
+    .sidebar {
+        align-items: center;
+        padding: 15px 8px 10px;
+    }
+
+    .brand {
+        justify-content: center;
+        margin: 4px 0 20px;
+    }
+
+    .brand-icon {
+        width: 37px;
+        height: 37px;
+    }
+
+    .brand-copy,
+    .workspace-copy,
+    .switch-icon,
+    .sidebar-label,
+    .nav-item span,
+    .workspace-switcher,
+    .sidebar-bottom .help-link span,
+    .sidebar-user-copy,
+    .logout-icon {
+        display: none;
+    }
+
+    .sidebar-nav {
+        width: 100%;
+        align-items: center;
+    }
+
+    .nav-item {
+        justify-content: center;
+        width: 46px;
+        min-height: 43px;
+        padding: 10px;
+    }
+
+    .nav-item > svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .nav-item .notification-count {
+        display: grid;
+        position: absolute;
+        width: 15px;
+        min-width: 15px;
+        height: 15px;
+        margin: -25px 0 0 25px;
+        padding: 0;
+        font-size: 8px;
+    }
+
+    .sidebar-bottom {
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+        padding-top: 20px;
+    }
+
+    .help-link {
+        justify-content: center;
+        padding: 8px;
+    }
+
+    .help-link svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .sidebar-user {
+        justify-content: center;
+    }
+
+    .sidebar-user .workspace-avatar {
+        width: 35px;
+        height: 35px;
+    }
+
+    .topbar {
+        padding: 0 16px;
+    }
+
+    .topbar-actions {
+        gap: 12px;
+    }
+
+    .global-search {
+        width: 36px;
+        justify-content: center;
+        padding: 0;
+        border-color: transparent;
+        background: transparent;
+    }
+
+    .global-search span,
+    .global-search kbd {
+        display: none;
+    }
+
+    .global-search svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .topbar-divider {
+        height: 24px;
+    }
+
+    .topbar-profile {
+        gap: 7px;
+    }
+
+    .topbar-profile > span:not(.topbar-avatar),
+    .topbar-profile > svg {
+        display: none;
+    }
+
+    .topbar-avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    .page-content {
+        padding: 20px 15px 15px;
+    }
+
+    .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 17px;
+    }
+
+    .heading-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .heading-actions .button {
+        flex: 1;
+    }
+
+    .tenant-summary {
+        flex-direction: column;
+        gap: 15px;
+        padding: 17px;
+    }
+
+    .tenant-identity {
+        gap: 12px;
+    }
+
+    .tenant-identity-copy h2 {
+        font-size: 19px;
+    }
+
+    .tenant-identity-copy p {
+        line-height: 1.7;
+    }
+
+    .tenant-summary-actions {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .left-column,
+    .right-column {
+        gap: 15px;
+    }
+
+    .contact-card {
+        padding: 19px;
+    }
+
+    .documents-card,
+    .allocated-room-card,
+    .payment-card {
+        padding: 18px 16px;
+    }
+
+    .room-heading {
+        align-items: flex-start;
+        flex-direction: row;
+    }
+
+    .property-address-row {
+        flex-direction: row;
+    }
+
+    .property-address-row p {
+        text-align: right;
+    }
+
+    .page-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        margin-top: 30px;
+    }
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 480px) {
+    :root {
+        --sidebar-width: 57px;
+    }
+
+    .sidebar {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    .brand-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 7px;
+    }
+
+    .nav-item {
+        width: 42px;
+        min-height: 42px;
+        padding: 9px;
+    }
+
+    .topbar {
+        padding: 0 11px;
+    }
+
+    .topbar-page-title {
+        font-size: 13px;
+    }
+
+    .topbar-actions {
+        gap: 9px;
+    }
+
+    .page-content {
+        padding: 17px 10px 13px;
+    }
+
+    .breadcrumb {
+        margin-bottom: 9px;
+        font-size: 10px;
+    }
+
+    .page-heading h1 {
+        font-size: 23px;
+    }
+
+    .page-heading p {
+        max-width: 340px;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .heading-actions {
+        gap: 7px;
+    }
+
+    .heading-actions .button {
+        gap: 6px;
+        min-height: 37px;
+        padding: 8px;
+        font-size: 10px;
+    }
+
+    .heading-actions .button svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .tenant-summary {
+        padding: 14px;
+    }
+
+    .tenant-photo {
+        width: 47px;
+        height: 47px;
+    }
+
+    .tenant-photo svg {
+        width: 33px;
+        height: 33px;
+    }
+
+    .tenant-identity-copy h2 {
+        font-size: 17px;
+    }
+
+    .tenant-identity-copy p {
+        font-size: 10px;
+    }
+
+    .tenant-summary-actions {
+        gap: 8px;
+    }
+
+    .tenant-summary-actions .button {
+        padding: 8px 9px;
+        font-size: 10px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 15px;
+    }
+
+    .stat-card {
+        min-height: 116px;
+        padding: 12px 11px;
+    }
+
+    .stat-top {
+        align-items: flex-start;
+        font-size: 10px;
+    }
+
+    .stat-top svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .stat-value {
+        margin-top: 12px;
+        font-size: clamp(19px, 5vw, 23px);
+        letter-spacing: -0.7px;
+    }
+
+    .stat-note {
+        padding-top: 9px;
+        font-size: 9px;
+    }
+
+    .left-column,
+    .right-column {
+        gap: 12px;
+    }
+
+    .section-title {
+        font-size: 13px;
+    }
+
+    .room-heading {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .room-heading h3 {
+        font-size: 15px;
+    }
+
+    .room-meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 10px;
+    }
+
+    .property-address-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .property-address-row p {
+        text-align: left;
+        font-size: 10px;
+    }
+
+    .history-tabs {
+        gap: 17px;
+    }
+
+    .history-tab {
+        font-size: 10px;
+    }
+
+    .payment-table {
+        min-width: 590px;
+    }
+
+    .payment-footer {
+        font-size: 9px;
+        line-height: 1.6;
+    }
+
+    .page-footer {
+        font-size: 9px;
+        line-height: 1.7;
+    }
+}
+
+/* =========================================
+   VERY SMALL MOBILE SCREENS
+   ========================================= */
+
+@media (max-width: 350px) {
+    .heading-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .heading-actions .button {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        min-height: 105px;
+    }
+
+    .tenant-summary-actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .room-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   REDUCED MOTION
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}

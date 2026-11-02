@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Properties | KirayaSetu</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/property_list.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">
+                <i class="fa-solid fa-house"></i>
+            </span>
+
+            <span class="brand-text">
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <!-- Workspace -->
+        <div class="workspace-selector">
+            <div class="workspace-avatar">{{ current_user_initials }}</div>
+
+            <div class="workspace-info">
+                <strong>{{ current_workspace_name }}</strong>
+                <span>Owner workspace</span>
+            </div>
+
+            <i class="fa-solid fa-angles-up-down workspace-arrow"></i>
+        </div>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav class="sidebar-nav">
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <i class="fa-solid fa-border-all"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'property_list' %}" class="nav-link active">
+                <i class="fa-solid fa-building"></i>
+                <span>Properties</span>
+            </a>
+
+            <a href="{% url 'rooms' %}" class="nav-link">
+                <i class="fa-solid fa-door-open"></i>
+                <span>Rooms</span>
+            </a>
+
+            <a href="{% url 'tenants' %}" class="nav-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Tenants</span>
+            </a>
+
+            <a href="{% url 'rent_management' %}" class="nav-link">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Rent Management</span>
+            </a>
+
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Electricity Bills</span>
+            </a>
+
+            <a href="{% url 'invoice_list' %}" class="nav-link">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Invoices &amp; Receipts</span>
+            </a>
+
+            <a href="{% url 'reports' %}" class="nav-link">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Reports &amp; Analytics</span>
+            </a>
+
+            <a href="{% url 'notifications' %}" class="nav-link">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                {% if unread_notifications_count > 0 %}
+                    <span class="nav-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'settings' %}" class="nav-link">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{ current_user_initials }}</div>
+
+                <div class="user-meta">
+                    <strong>{{ current_user_name }}</strong>
+                    <span>Workspace owner</span>
+                </div>
+
+                <a href="{% url 'logout' %}" title="Sign out" style="color: inherit; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
+                </a>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-area">
+
+        <!-- TOP NAVBAR -->
+        <header class="topbar">
+            <div class="page-name">Properties</div>
+
+            <div class="topbar-right">
+                <form method="get" action="{% url 'property_list' %}" class="global-search" style="margin: 0;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" name="q" value="{{ search_query }}" placeholder="Search properties or locations...">
+                    <span>Enter</span>
+                </form>
+
+                <a href="{% url 'notifications' %}" class="icon-button notification-button" aria-label="Notifications" style="text-decoration: none; color: inherit;">
+                    <i class="fa-regular fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                        <span class="notification-dot"></span>
+                    {% endif %}
+                </a>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+                    <div class="user-avatar">{{ current_user_initials }}</div>
+                    <span>{{ current_user_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <section class="page-content">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #035E7B; color: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- PAGE HEADING -->
+            <div class="page-heading">
+                <div>
+                    <h1>Your properties, in one place</h1>
+                    <p>{{ total_properties_count }} properties · {{ total_rooms_count }} rooms · A clearer view of every address.</p>
+                </div>
+
+                <div class="heading-actions">
+                    <a href="{% url 'add-property' %}">
+                        <button class="button button-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            Add property
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- SEARCH AND FILTERS -->
+            <div class="toolbar">
+                <form method="get" action="{% url 'property_list' %}" class="property-search" style="flex: 1; margin: 0;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" name="q" value="{{ search_query }}" placeholder="Search properties or locations...">
+                </form>
+
+                <div class="toolbar-actions">
+                    <a href="{% url 'property_list' %}" class="button button-outline" style="text-decoration: none;">
+                        All properties
+                    </a>
+                </div>
+            </div>
+
+            <!-- PROPERTY GRID -->
+            <div class="property-grid">
+                {% if properties %}
+                    {% for item in properties %}
+                        <article class="property-card">
+                            <div class="property-image image-one">
+                                <div class="image-placeholder">
+                                    <i class="fa-solid fa-building"></i>
+                                    <span>{{ item.obj.get_property_type_display }}</span>
+                                </div>
+                            </div>
+
+                            <div class="property-body">
+                                <div class="property-title-row">
+                                    <h2>{{ item.obj.name }}</h2>
+                                    <a href="{% url 'edit_property_id' item.obj.id %}" title="Edit" style="color: #5A7184; font-size: 14px; text-decoration: none;">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                </div>
+
+                                <p class="property-address">
+                                    {{ item.obj.address }}, {{ item.obj.city }}, {{ item.obj.state }} {{ item.obj.pin_code }}
+                                </p>
+
+                                <div class="property-meta">
+                                    <span>{{ item.total_rooms }} rooms · {{ item.occupied_rooms }} occupied</span>
+                                    <span class="vacant-badge">
+                                        <i class="fa-solid fa-circle"></i>
+                                        {{ item.vacant_rooms }} vacant
+                                    </span>
+                                </div>
+
+                                <div class="occupancy-track">
+                                    <div class="occupancy-fill" style="width: {{ item.occupancy_percent }}%;"></div>
+                                </div>
+
+                                <div class="property-finances">
+                                    <div class="rent-collected">
+                                        <span class="finance-label">MONTHLY BASE RENT</span>
+                                        <strong>₹{{ item.obj.monthly_rent|floatformat:2 }}</strong>
+                                    </div>
+
+                                    <div class="pending-rent">
+                                        <span class="finance-label">OCCUPANCY</span>
+                                        <strong>{{ item.occupancy_percent }}%</strong>
+                                    </div>
+
+                                    <a href="{% url 'property_detail_id' item.obj.id %}" class="view-property">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                        View property
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                {% else %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 48px; background: white; border-radius: 16px; border: 1px solid #CBD8E0;">
+                        <i class="fa-solid fa-building" style="font-size: 36px; color: #5A7184; margin-bottom: 12px;"></i>
+                        <h2 style="font-size: 18px; color: #142D3B; margin-bottom: 6px;">No properties found</h2>
+                        <p style="color: #5A7184; font-size: 14px; margin-bottom: 18px;">Get started by adding your first rental building or apartment.</p>
+                        <a href="{% url 'add-property' %}">
+                            <button class="button button-primary">
+                                <i class="fa-solid fa-plus"></i> Add Property Now
+                            </button>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

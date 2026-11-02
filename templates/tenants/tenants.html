@@ -1,0 +1,437 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#EAF4F7">
+    <title>Tenants | KirayaSetu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tenants.css' %}">
+    <style>
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(20, 45, 59, 0.45); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 16px; width: 100%; max-width: 520px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; padding: 28px;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #142D3B; margin-bottom: 6px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px 12px; border: 1.5px solid #CBD8E0; border-radius: 8px;
+            font-size: 14px; font-family: inherit; outline: none; box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>
+                    <path d="M9 21v-8h6v8"/>
+                </svg>
+            </span>
+            <span class="brand-copy">
+                <strong>KirayaSetu</strong>
+                <small>SMART RENTAL MANAGEMENT</small>
+            </span>
+        </a>
+
+        <div class="workspace-switcher">
+            <span class="avatar">{{ current_user_initials }}</span>
+            <span class="workspace-copy">
+                <strong>{{ current_workspace_name }}</strong>
+                <small>Owner workspace</small>
+            </span>
+            <svg class="workspace-chevron" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8">
+                <path d="m8 10 4-4 4 4M8 14l4 4 4-4"/>
+            </svg>
+        </div>
+
+        <p class="nav-heading">WORKSPACE</p>
+
+        <nav class="main-navigation" aria-label="Main navigation">
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'property_list' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="7" width="18" height="14" rx="1.5"/>
+                    <path d="M7 7V4h10v3M7 11v2m5-2v2m5-2v2M7 16v2m5-2v2m5-2v2"/>
+                </svg>
+                <span>Properties</span>
+            </a>
+
+            <a href="{% url 'rooms' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 21h16M6 21V5l6-2v18m0-12h6v12"/>
+                    <path d="M9 7v1m0 4v1m0 4v1m6-4v1m0 3v1"/>
+                </svg>
+                <span>Rooms</span>
+            </a>
+
+            <a href="{% url 'tenants' %}" class="nav-link active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="8" r="3.5"/>
+                    <path d="M2.5 20v-2a6.5 6.5 0 0 1 13 0v2"/>
+                    <path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14a5.5 5.5 0 0 1 3.5 5.1"/>
+                </svg>
+                <span>Tenants</span>
+            </a>
+
+            <a href="{% url 'rent_management' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="15" rx="2"/>
+                    <path d="M3 9h18M16 14h2"/>
+                    <path d="M6 5V3h12v2"/>
+                </svg>
+                <span>Rent Management</span>
+            </a>
+
+            <a href="{% url 'electricity_bill_form' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m13 2-10 12h8l-1 8 11-13h-8z"/>
+                </svg>
+                <span>Electricity Bills</span>
+            </a>
+
+            <a href="{% url 'invoice_list' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                    <path d="M14 2v6h6M8 13h8M8 17h6M8 9h2"/>
+                </svg>
+                <span>Invoices &amp; Receipts</span>
+            </a>
+
+            <a href="{% url 'reports' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v18h18"/>
+                    <path d="m7 14 4-4 4 3 6-8"/>
+                </svg>
+                <span>Reports &amp; Analytics</span>
+            </a>
+
+            <a href="{% url 'notifications' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                    <path d="M10 21h4"/>
+                </svg>
+                <span>Notifications</span>
+                {% if unread_notifications_count > 0 %}
+                    <span class="nav-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'settings' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <span class="avatar">{{ current_user_initials }}</span>
+                <span class="user-meta">
+                    <strong>{{ current_user_name }}</strong>
+                    <small>Workspace owner</small>
+                </span>
+                <a href="{% url 'logout' %}" class="logout-link" title="Sign out" style="color: inherit; text-decoration: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-area">
+
+        <!-- TOP NAVBAR -->
+        <header class="topbar">
+            <div class="page-title">Tenants</div>
+
+            <div class="topbar-actions">
+                <form method="get" action="{% url 'tenants' %}" class="search-input" style="margin: 0;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="m20 20-3.5-3.5"/>
+                    </svg>
+                    <input type="search" name="q" value="{{ search_query }}" placeholder="Search tenants...">
+                </form>
+
+                <a href="{% url 'notifications' %}" class="icon-button notification-button" style="text-decoration: none; color: inherit;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                        <path d="M10 21h4"/>
+                    </svg>
+                    {% if unread_notifications_count > 0 %}
+                        <span class="notification-dot"></span>
+                    {% endif %}
+                </a>
+
+                <span class="topbar-divider"></span>
+
+                <div class="topbar-profile">
+                    <span class="avatar">{{ current_user_initials }}</span>
+                    <span>{{ current_user_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="page-content">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #035E7B; color: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- PAGE INTRO -->
+            <section class="page-intro">
+                <div class="intro-copy">
+                    <h1>Good relationships start here</h1>
+                    <p>Contact details, room allocations and rental histories, thoughtfully organised.</p>
+                </div>
+
+                <div class="intro-actions">
+                    <button type="button" class="button button-primary" onclick="openTenantModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="8" r="3.5"/>
+                            <path d="M2.5 20v-2a6.5 6.5 0 0 1 13 0v2"/>
+                            <path d="M19 8v6m-3-3h6"/>
+                        </svg>
+                        Add tenant
+                    </button>
+                </div>
+            </section>
+
+            <!-- SUMMARY CARDS -->
+            <section class="stats-grid" aria-label="Tenant statistics">
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Active tenants</span>
+                        <i class="fa-solid fa-users" style="color: #035E7B;"></i>
+                    </div>
+                    <strong class="stat-value">{{ active_tenants_count }}</strong>
+                    <p class="stat-note">Allocated to rooms</p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Total tenant profiles</span>
+                        <i class="fa-solid fa-address-book" style="color: #035E7B;"></i>
+                    </div>
+                    <strong class="stat-value">{{ total_tenants }}</strong>
+                    <p class="stat-note note-success">In your directory</p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Security deposits held</span>
+                        <i class="fa-solid fa-shield-halved" style="color: #035E7B;"></i>
+                    </div>
+                    <strong class="stat-value">₹{{ total_deposits|floatformat:2 }}</strong>
+                    <p class="stat-note">Across active agreements</p>
+                </article>
+            </section>
+
+            <!-- TENANT DIRECTORY -->
+            <section class="directory-card">
+                <div class="directory-header">
+                    <h2>Tenant directory</h2>
+                    <p>Keep tenant contacts and active agreements at your fingertips.</p>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="tenant-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">TENANT</th>
+                                <th scope="col">CONTACT</th>
+                                <th scope="col">PROPERTY / ROOM</th>
+                                <th scope="col">MONTHLY RENT</th>
+                                <th scope="col">MOVE-IN</th>
+                                <th scope="col">STATUS</th>
+                                <th scope="col" class="action-column">ACTION</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% if tenants %}
+                                {% for item in tenants %}
+                                    <tr>
+                                        <td>
+                                            <div class="tenant-identity">
+                                                <span class="tenant-avatar">{{ item.tenant.full_name|slice:":2"|upper }}</span>
+                                                <span class="tenant-details">
+                                                    <strong>{{ item.tenant.full_name }}</strong>
+                                                    <small>{{ item.tenant.email|default:"No email recorded" }}</small>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="contact-cell">{{ item.tenant.phone }}</td>
+                                        <td>
+                                            {% if item.room %}
+                                                <div class="cell-details">
+                                                    <strong>{{ item.property.name }}</strong>
+                                                    <small>Room {{ item.room.room_number }}</small>
+                                                </div>
+                                            {% else %}
+                                                <span style="color: #5A7184;">No active room</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="rent-cell">
+                                            {% if item.agreement %}
+                                                ₹{{ item.agreement.monthly_rent|floatformat:2 }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td class="date-cell">
+                                            {% if item.agreement %}
+                                                {{ item.agreement.start_date|date:"d M Y" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item.agreement %}
+                                                <span class="status-badge"><span></span>Active</span>
+                                            {% else %}
+                                                <span class="status-badge" style="background: #EAF4F7; color: #5A7184;"><span style="background: #5A7184;"></span>Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'tenant_detail_id' item.tenant.id %}" class="row-action" title="View details">↗</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px; color: #5A7184;">
+                                        No tenants found. Click "Add tenant" above to create your first tenant profile.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="directory-footer">
+                    <span>Showing {{ tenants|length }} tenant records</span>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <span>KirayaSetu · Smart rental management for every property owner</span>
+                <span>All amounts in INR · IST</span>
+            </footer>
+
+        </div>
+    </main>
+</div>
+
+<!-- ADD TENANT MODAL -->
+<div id="tenantModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #142D3B; margin: 0;">Add New Tenant</h2>
+            <button type="button" onclick="closeTenantModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #5A7184;">✕</button>
+        </div>
+
+        <form method="post" action="{% url 'add_tenant' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="full_name">Full Name <span>*</span></label>
+                <input type="text" name="full_name" id="full_name" placeholder="e.g. Rahul Sharma" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number <span>*</span></label>
+                <input type="tel" name="phone" id="phone" placeholder="e.g. +91 98765 43210" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" placeholder="e.g. rahul@example.com">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label for="emergency_contact">Emergency Contact Name</label>
+                    <input type="text" name="emergency_contact" id="emergency_contact" placeholder="Guardian / relative">
+                </div>
+                <div class="form-group">
+                    <label for="emergency_phone">Emergency Phone</label>
+                    <input type="tel" name="emergency_phone" id="emergency_phone" placeholder="Contact number">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" class="button button-secondary" onclick="closeTenantModal()">Cancel</button>
+                <button type="submit" class="button button-primary">Save Tenant Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openTenantModal() {
+        document.getElementById('tenantModal').classList.add('active');
+    }
+    function closeTenantModal() {
+        document.getElementById('tenantModal').classList.remove('active');
+    }
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeTenantModal();
+    });
+</script>
+
+</body>
+</html>
