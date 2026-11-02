@@ -78,21 +78,23 @@ class OwnerRegistrationView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        email_sent = getattr(challenge, "email_sent", True)
+        email_sent = getattr(challenge, "email_sent", False)
+        if not email_sent:
+            return Response(
+                {
+                    "detail": f"Failed to deliver verification email to {user.email}. Please verify your email address and try again.",
+                    "code": "EMAIL_DELIVERY_FAILED",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         response_data = {
-            "detail": (
-                "Registration initiated. Verification code sent to your email."
-                if email_sent
-                else f"Registration initiated! (Render Free Tier Note: Your OTP is {otp})"
-            ),
+            "detail": "Registration initiated. Verification code sent to your email.",
             "email": user.email,
             "masked_email": mask_email(user.email),
             "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
             "expires_in_minutes": OTP_EXPIRY_MINUTES,
-            "email_sent": email_sent,
         }
-        if not email_sent:
-            response_data["otp_preview"] = otp
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
@@ -319,20 +321,22 @@ class ResendEmailOTPView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
+        if not email_sent:
+            return Response(
+                {
+                    "detail": f"Failed to send verification email to {email}. Please try again later.",
+                    "code": "EMAIL_DELIVERY_FAILED",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         response_data = {
-            "detail": (
-                "A new verification code has been sent to your email."
-                if email_sent
-                else f"New verification code generated! (Render Free Tier Note: Your OTP is {otp})"
-            ),
+            "detail": "A new 6-digit verification code has been sent to your email.",
             "email": email,
             "masked_email": mask_email(email),
             "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
             "expires_in_minutes": OTP_EXPIRY_MINUTES,
-            "email_sent": email_sent,
         }
-        if not email_sent:
-            response_data["otp_preview"] = otp
 
         return Response(
             response_data,
