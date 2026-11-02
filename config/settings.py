@@ -179,8 +179,22 @@ else:
         }
     else:
         db_options = {"charset": "utf8mb4"}
-        if env_bool("DB_SSL_REQUIRE", False) or os.getenv("DB_SSL_MODE"):
-            db_options["ssl"] = {"ssl_mode": os.getenv("DB_SSL_MODE", "REQUIRED")}
+        db_port = os.getenv("DB_PORT", "3306").strip()
+        is_ssl_required = (
+            env_bool("DB_SSL_REQUIRE", False)
+            or bool(os.getenv("DB_SSL_MODE"))
+            or db_port == "4000"
+        )
+        if is_ssl_required:
+            ssl_conf = {}
+            ca_path = os.getenv("DB_SSL_CA", "").strip()
+            if ca_path and os.path.exists(ca_path):
+                ssl_conf["ca"] = ca_path
+            elif os.path.exists("/etc/ssl/certs/ca-certificates.crt"):
+                ssl_conf["ca"] = "/etc/ssl/certs/ca-certificates.crt"
+            elif os.path.exists("/etc/ssl/cert.pem"):
+                ssl_conf["ca"] = "/etc/ssl/cert.pem"
+            db_options["ssl"] = ssl_conf
 
         DATABASES = {
             "default": {
@@ -189,7 +203,7 @@ else:
                 "USER": os.getenv("DB_USER", "root"),
                 "PASSWORD": os.getenv("DB_PASSWORD", ""),
                 "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-                "PORT": os.getenv("DB_PORT", "3306"),
+                "PORT": db_port,
                 "OPTIONS": db_options,
             }
         }
