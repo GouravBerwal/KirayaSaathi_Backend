@@ -290,6 +290,8 @@ _DEFAULT_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://kirayasaathi.app",
+    "https://www.kirayasaathi.app",
 ]
 
 _CONFIGURED_CORS = env_list("CORS_ALLOWED_ORIGINS", "")
@@ -298,6 +300,7 @@ CORS_ALLOWED_ORIGINS = list(dict.fromkeys(_DEFAULT_ORIGINS + _CONFIGURED_CORS))
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
     r"^https://.*\.onrender\.com$",
+    r"^https://.*\.kirayasaathi\.app$",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -313,8 +316,15 @@ _CONFIGURED_CSRF = env_list("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
     _DEFAULT_ORIGINS
     + _CONFIGURED_CSRF
-    + ["https://*.vercel.app", "https://*.onrender.com"]
+    + [
+        "https://*.vercel.app",
+        "https://*.onrender.com",
+        "https://kirayasaathi.app",
+        "https://*.kirayasaathi.app",
+    ]
 ))
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://kirayasaathi.app")
 
 
 # --------------------------------------------------
