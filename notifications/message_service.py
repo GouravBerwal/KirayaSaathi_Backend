@@ -1,8 +1,108 @@
 import re
+import os
+import json
+import base64
+import logging
 import urllib.parse
+import urllib.request
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+
+
+def send_fast2sms(phone_raw: str, message: str) -> bool:
+    """Send Quick SMS to an Indian 10-digit mobile number via Fast2SMS HTTPS API."""
+    api_key = os.getenv("FAST2SMS_API_KEY", getattr(settings, "FAST2SMS_API_KEY", "")).strip()
+    if not api_key:
+        api_key = getattr(settings, "SMS_API_KEY", "").strip() or os.getenv("SMS_API_KEY", "").strip()
+    if not api_key:
+        return False
+
+    clean_digits = re.sub(r"\D", "", str(phone_raw))
+    if clean_digits.startswith("91") and len(clean_digits) == 12:
+        clean_digits = clean_digits[2:]
+    elif clean_digits.startswith("0") and len(clean_digits) == 11:
+        clean_digits = clean_digits[1:]
+
+    if len(clean_digits) != 10:
+        return False
+
+    payload = json.dumps({
+        "route": "q",
+        "message": message[:160],
+        "language": "english",
+        "flash": 0,
+        "numbers": clean_digits,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://www.fast2sms.com/dev/bulkV2",
+        data=payload,
+        headers={
+            "authorization": api_key,
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0",
+        },
+    )
+    try:
+        import ssl
+        ctx = None
+        if os.path.exists("/etc/ssl/certs/ca-certificates.crt"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/certs/ca-certificates.crt")
+        elif os.path.exists("/etc/ssl/cert.pem"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
+            body = resp.read().decode("utf-8", errors="ignore")
+            data = json.loads(body) if body else {}
+            is_ok = resp.status in (200, 201) and (data.get("return") is True or "request_id" in data)
+            if is_ok:
+                logger.info("Fast2SMS successfully delivered to %s", clean_digits)
+            else:
+                logger.warning("Fast2SMS returned non-success: %s", body)
+            return is_ok
+    except Exception as e:
+        logger.warning("Fast2SMS dispatch failed: %s", e)
+        return False
+
+
+def send_twilio_sms(phone_raw: str, message: str) -> bool:
+    """Send SMS via Twilio REST API."""
+    sid = getattr(settings, "TWILIO_ACCOUNT_SID", "").strip() or os.getenv("TWILIO_ACCOUNT_SID", "").strip()
+    token = getattr(settings, "TWILIO_AUTH_TOKEN", "").strip() or os.getenv("TWILIO_AUTH_TOKEN", "").strip()
+    from_num = getattr(settings, "TWILIO_PHONE_NUMBER", "").strip() or os.getenv("TWILIO_PHONE_NUMBER", "").strip()
+    if not (sid and token and from_num):
+        return False
+
+    digits = clean_phone_number(phone_raw)
+    to_num = f"+{digits}" if not digits.startswith("+") else digits
+
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
+    data = urllib.parse.urlencode({
+        "From": from_num,
+        "To": to_num,
+        "Body": message[:160],
+    }).encode("utf-8")
+
+    req = urllib.request.Request(url, data=data, method="POST")
+    auth = base64.b64encode(f"{sid}:{token}".encode("ascii")).decode("ascii")
+    req.add_header("Authorization", f"Basic {auth}")
+    req.add_header("User-Agent", "Mozilla/5.0")
+    try:
+        import ssl
+        ctx = None
+        if os.path.exists("/etc/ssl/certs/ca-certificates.crt"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/certs/ca-certificates.crt")
+        elif os.path.exists("/etc/ssl/cert.pem"):
+            ctx = ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
+            return resp.status in (200, 201)
+    except Exception as e:
+        logger.warning("Twilio SMS failed: %s", e)
+        return False
 
 
 def clean_phone_number(phone_raw):
@@ -115,15 +215,23 @@ def send_actual_notification(notification, channel="WHATSAPP"):
         if recipient_email:
             try:
                 subject = f"Monthly Bill & Rent Due: {notification.title} - {ctx['property_name']}"
-                send_mail(
-                    subject=subject,
-                    message=text,
-                    from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasetu.com"),
-                    recipient_list=[recipient_email],
-                    fail_silently=True,
-                )
+                from accounts.services import send_http_email_brevo
+                html_body = f"""<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
+<div style="max-width: 560px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 8px; border: 1px solid #e2e8f0;">
+<h2 style="color: #4f46e5; margin-top: 0;">KirayaSaathi Bill Notice</h2>
+<p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6;">{text}</p>
+</div></div>"""
+                if not send_http_email_brevo(recipient_email, subject, html_body, text):
+                    send_mail(
+                        subject=subject,
+                        message=text,
+                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasetu.com"),
+                        recipient_list=[recipient_email],
+                        fail_silently=True,
+                    )
                 email_sent = True
-            except Exception:
+            except Exception as e:
+                logger.warning("Email reminder dispatch failed: %s", e)
                 email_sent = False
 
         # 2. Prepare WhatsApp
@@ -155,13 +263,27 @@ def send_actual_notification(notification, channel="WHATSAPP"):
             raise ValueError(f"Tenant {ctx['tenant_name']} ke paas email address saved nahi hai.")
 
         subject = f"Payment Reminder: {notification.title} - {ctx['property_name']}"
-        send_mail(
-            subject=subject,
-            message=text,
-            from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasetu.com"),
-            recipient_list=[recipient_email],
-            fail_silently=False,
-        )
+        from accounts.services import send_http_email_brevo
+        html_body = f"""<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
+<div style="max-width: 560px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 8px; border: 1px solid #e2e8f0;">
+<h2 style="color: #4f46e5; margin-top: 0;">KirayaSaathi Bill Reminder</h2>
+<p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6;">{text}</p>
+</div></div>"""
+        sent_ok = False
+        try:
+            sent_ok = send_http_email_brevo(recipient_email, subject, html_body, text)
+        except Exception as e:
+            logger.warning("Brevo email failed: %s", e)
+            sent_ok = False
+
+        if not sent_ok:
+            send_mail(
+                subject=subject,
+                message=text,
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasetu.com"),
+                recipient_list=[recipient_email],
+                fail_silently=False,
+            )
 
         notification.is_sent = True
         notification.sent_at = now
@@ -178,40 +300,42 @@ def send_actual_notification(notification, channel="WHATSAPP"):
         if not recipient_phone:
             raise ValueError(f"Tenant {ctx['tenant_name']} ke paas phone number saved nahi hai.")
 
-        # If Twilio is configured
-        twilio_sid = getattr(settings, "TWILIO_ACCOUNT_SID", "")
-        twilio_token = getattr(settings, "TWILIO_AUTH_TOKEN", "")
-        twilio_from = getattr(settings, "TWILIO_PHONE_NUMBER", "")
+        sms_sent = False
+        gateway_name = ""
 
-        if twilio_sid and twilio_token and twilio_from:
+        # 1. Try Fast2SMS first (India Quick SMS route)
+        try:
+            if send_fast2sms(recipient_phone, text):
+                sms_sent = True
+                gateway_name = "Fast2SMS"
+        except Exception as e:
+            logger.warning("Fast2SMS attempt error: %s", e)
+
+        # 2. Fallback to Twilio if Fast2SMS didn't send
+        if not sms_sent:
             try:
-                import urllib.request
-                import base64
-
-                url = f"https://api.twilio.com/2010-04-01/Accounts/{twilio_sid}/Messages.json"
-                data = urllib.parse.urlencode({
-                    "From": twilio_from,
-                    "To": f"+{recipient_phone}",
-                    "Body": text[:160],
-                }).encode("utf-8")
-                req = urllib.request.Request(url, data=data, method="POST")
-                auth = base64.b64encode(f"{twilio_sid}:{twilio_token}".encode("ascii")).decode("ascii")
-                req.add_header("Authorization", f"Basic {auth}")
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    pass
+                if send_twilio_sms(recipient_phone, text):
+                    sms_sent = True
+                    gateway_name = "Twilio"
             except Exception as e:
-                # Log but continue
-                pass
+                logger.warning("Twilio attempt error: %s", e)
 
         notification.is_sent = True
         notification.sent_at = now
         notification.sent_via = "SMS"
-        notification.delivery_status = "SENT"
+        notification.delivery_status = "SENT" if sms_sent else "PENDING"
         notification.save(update_fields=["is_sent", "sent_at", "sent_via", "delivery_status"])
 
         dispatch_result["success"] = True
+        dispatch_result["sms_sent"] = sms_sent
         dispatch_result["recipient"] = recipient_phone
-        dispatch_result["message"] = f"SMS reminder dispatched to +{recipient_phone}!"
+        if sms_sent:
+            dispatch_result["message"] = f"SMS reminder successfully sent to +{recipient_phone} via {gateway_name}!"
+        else:
+            dispatch_result["message"] = (
+                f"SMS recorded for +{recipient_phone}. "
+                f"Real SMS dispatch requires FAST2SMS_API_KEY in Render environment settings."
+            )
 
     else:
         # WHATSAPP (Default)
