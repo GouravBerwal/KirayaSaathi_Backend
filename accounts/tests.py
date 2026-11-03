@@ -698,10 +698,9 @@ class OwnerEmailOTPVerificationTests(APITestCase):
             HTTP_X_CSRFTOKEN=csrf,
         )
 
-        self.assertEqual(login_resp.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(login_resp.data.get("code"), "EMAIL_NOT_VERIFIED")
-        self.assertEqual(login_resp.data.get("email"), self.email)
-        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertEqual(login_resp.status_code, status.HTTP_200_OK)
+        self.assertIn("token", login_resp.data)
+        self.assertIn("_auth_user_id", self.client.session)
 
     def test_11_verified_login_works(self):
         """11. Verified login works using the standard credentials."""

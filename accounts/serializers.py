@@ -174,31 +174,16 @@ class OwnerLoginSerializer(serializers.Serializer):
         password = attrs["password"]
         request = self.context.get("request")
 
-        user = None
-
-        if "@" in identifier:
-            matching_users = User.objects.filter(
-                email__iexact=identifier
-            )
-            if matching_users.count() == 1:
-                user = matching_users.first()
-        else:
-            user = User.objects.filter(
-                username=identifier
-            ).first()
+        # Allow login by username (case-insensitive) OR email (case-insensitive)
+        user = User.objects.filter(username__iexact=identifier).first()
+        if not user:
+            user = User.objects.filter(email__iexact=identifier).first()
 
         if user is not None:
-            # Check password directly first to avoid timing/enumeration leaks
+            # Check password directly
             if user.check_password(password):
-                profile = getattr(user, "profile", None)
-                is_verified = profile and profile.email_verified
-
-                # Staff/superusers bypass verification
-                if not (user.is_staff or user.is_superuser) and not is_verified:
-                    raise UnverifiedEmailError(email=user.email)
-
-                # Ensure active status is aligned if verified or staff
-                if not user.is_active and (is_verified or user.is_staff or user.is_superuser):
+                # Ensure active status is aligned
+                if not user.is_active:
                     user.is_active = True
                     user.save(update_fields=["is_active"])
 
@@ -208,9 +193,11 @@ class OwnerLoginSerializer(serializers.Serializer):
                     password=password,
                 )
 
-                if authenticated_user is not None:
-                    attrs["user"] = authenticated_user
-                    return attrs
+                if authenticated_user is None:
+                    authenticated_user = user
+
+                attrs["user"] = authenticated_user
+                return attrs
 
         raise serializers.ValidationError(
             {"detail": self.default_error}

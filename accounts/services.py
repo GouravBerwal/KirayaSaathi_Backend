@@ -377,29 +377,26 @@ def send_owner_approval_email(email: str, username: str, property_name: str = ""
     Exact message required:
     'Your KirayaSetu workspace is ready! You can now log in and start using your owner dashboard.'
     """
-    subject = "Your KirayaSetu Workspace is Ready! — Account Approved"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello Property Owner,"
+    subject = "Your KirayaSaathi Workspace is Ready! — Account Approved"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    frontend_url = getattr(settings, "FRONTEND_URL", "https://kiraya-saathi-frontend.vercel.app").rstrip("/")
+    login_url = f"{frontend_url}/login"
+    greeting = f"Namaste {username}," if username else "Namaste Property Owner,"
     prop_detail = f" for {property_name}" if property_name else ""
 
     text_content = f"""{greeting}
 
 Congratulations! Your property verification request{prop_detail} has been approved by our administrative team.
 
-Your KirayaSetu workspace is ready! You can now log in and start using your owner dashboard.
+Your KirayaSaathi workspace is ready! You can now log in and start using your owner dashboard.
 
-Features unlocked:
-- Complete Property, Room & Floor Management
-- Automated Tenant Rent Records & Monthly Invoicing
-- Sub-meter Electricity Unit Billing & Rate Rules
-- Payment Tracking & Historical Financial Ledger
-- Automated Rent Reminders via WhatsApp & Email
+Aapka KirayaSaathi owner account approve ho gaya hai. Ab aap login karke apna owner dashboard use kar sakte hain.
 
 Login to your dashboard:
-https://kirayasetu.com/login
+{login_url}
 
 Best regards,
-KirayaSetu Administrative Team
+KirayaSaathi Administrative Team
 """
 
     html_content = f"""<!DOCTYPE html>
@@ -409,7 +406,7 @@ KirayaSetu Administrative Team
   <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 580px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
     <tr>
       <td style="background: linear-gradient(135deg, #035E7B 0%, #00877C 100%); padding: 32px 28px; text-align: center;">
-        <h1 style="color: #fff; margin: 0; font-size: 24px; font-weight: 700;">KirayaSetu</h1>
+        <h1 style="color: #fff; margin: 0; font-size: 24px; font-weight: 700;">KirayaSaathi</h1>
         <p style="color: #e6fffa; margin: 6px 0 0; font-size: 13px;">Property Verification Approved</p>
       </td>
     </tr>
@@ -418,18 +415,18 @@ KirayaSetu Administrative Team
         <h2 style="color: #035E7B; margin: 0 0 16px; font-size: 20px;">Your Workspace is Ready!</h2>
         <p style="font-size: 14px; line-height: 1.6; color: #475569;">
           {greeting}<br><br>
-          Great news! Your property ownership verification{prop_detail} has been reviewed and <strong>approved</strong> by our administrative team.
+          Badhai ho! Aapki property verification request{prop_detail} administrative team dwara <strong>approve</strong> kar di gayi hai.
         </p>
         <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 16px; border-radius: 6px; margin: 24px 0;">
           <p style="margin: 0; font-size: 15px; font-weight: 600; color: #166534;">
-            Your KirayaSetu workspace is ready! You can now log in and start using your owner dashboard.
+            Your KirayaSaathi workspace is ready! You can now log in and start using your owner dashboard.
           </p>
         </div>
         <p style="font-size: 14px; color: #475569;">
-          You can now add properties, assign tenants, track utility meters, generate monthly bills, and record rent payments.
+          Ab aap apne dashboard me properties add kar sakte hain, tenants assign kar sakte hain, bijli ke bill generate kar sakte hain aur rent payment track kar sakte hain.
         </p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="https://kirayasetu.com/login" style="background: #035E7B; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block;">
+          <a href="{login_url}" style="background: #035E7B; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block;">
             Access Owner Dashboard
           </a>
         </div>
@@ -437,13 +434,24 @@ KirayaSetu Administrative Team
     </tr>
     <tr>
       <td style="background: #f8fafc; padding: 16px 28px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
-        &copy; {timezone.now().year} KirayaSetu Platform. All rights reserved.
+        &copy; {timezone.now().year} KirayaSaathi Platform. All rights reserved.
       </td>
     </tr>
   </table>
 </body>
 </html>"""
 
+    # 1. Try Brevo HTTPS API first (Works reliably on Render / Port 443)
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        logger.info("Approval email delivered via Brevo HTTPS to %s", email)
+        return True
+
+    # 2. Try Resend HTTPS API
+    if send_http_email_resend(email, subject, html_content, text_content):
+        logger.info("Approval email delivered via Resend HTTPS to %s", email)
+        return True
+
+    # 3. Fallback to standard Django mail
     try:
         send_mail(
             subject=subject,
@@ -463,29 +471,89 @@ def send_owner_rejection_email(email: str, username: str, property_name: str, re
     """
     Sends notification to owner when an account/request is rejected with the administrator's note.
     """
-    subject = "Notice: Your KirayaSetu Account has been Rejected"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello Property Owner,"
+    subject = "Notice: KirayaSaathi Verification Request Update"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    frontend_url = getattr(settings, "FRONTEND_URL", "https://kiraya-saathi-frontend.vercel.app").rstrip("/")
+    login_url = f"{frontend_url}/login"
+    greeting = f"Namaste {username}," if username else "Namaste Property Owner,"
     prop_detail = f" for '{property_name}'" if property_name else ""
+    rejection_reason_text = reason or 'The uploaded documents or registration details did not meet our verification criteria.'
 
     text_content = f"""{greeting}
 
-This is to inform you that your KirayaSetu property owner account / verification request{prop_detail} has been rejected by the platform administrator.
+This is to inform you that your KirayaSaathi property owner verification request{prop_detail} was reviewed and could not be approved at this time.
 
-Administrator's Note / Reason:
-{reason or 'The uploaded documents or registration details did not meet our verification criteria.'}
+Rejection Reason (Kyu reject hui):
+{rejection_reason_text}
 
-While rejected, access to the owner dashboard is revoked. If you wish to submit revised verification documents or clarify your details, please log in to your KirayaSetu account.
+Aapki request reject hone ka mukhya kaaran upar diya gaya hai. Agar aap dobara apply karna chahte hain ya corrected details upload karna chahte hain, toh kripya login karein:
+{login_url}
 
 Best regards,
-KirayaSetu Verification Team
-https://kirayasetu.com
+KirayaSaathi Verification Team
 """
 
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Verification Request Update</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; padding: 24px; color: #1e293b;">
+  <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 580px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+    <tr>
+      <td style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); padding: 32px 28px; text-align: center;">
+        <h1 style="color: #fff; margin: 0; font-size: 24px; font-weight: 700;">KirayaSaathi</h1>
+        <p style="color: #ffe4e6; margin: 6px 0 0; font-size: 13px;">Verification Request Update</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 32px 28px;">
+        <h2 style="color: #be123c; margin: 0 0 16px; font-size: 20px;">Verification Request Rejected</h2>
+        <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+          {greeting}<br><br>
+          Aapki KirayaSaathi property verification request{prop_detail} review ki gayi aur filhaal reject kar di gayi hai.
+        </p>
+        <div style="background: #fff1f2; border-left: 4px solid #e11d48; padding: 16px; border-radius: 6px; margin: 24px 0;">
+          <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 600; color: #9f1239; text-transform: uppercase; letter-spacing: 0.5px;">
+            Rejection Reason (Reject hone ka kaaran):
+          </p>
+          <p style="margin: 0; font-size: 15px; color: #881337; font-weight: 500;">
+            {rejection_reason_text}
+          </p>
+        </div>
+        <p style="font-size: 14px; color: #475569;">
+          Agar aap naye documents upload karna chahte hain ya details update karna chahte hain, toh aap login karke status check kar sakte hain:
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="{login_url}" style="background: #be123c; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block;">
+            Check Status & Re-apply
+          </a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="background: #f8fafc; padding: 16px 28px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
+        &copy; {timezone.now().year} KirayaSaathi Platform. All rights reserved.
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+    # 1. Try Brevo HTTPS API first
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        logger.info("Rejection email delivered via Brevo HTTPS to %s", email)
+        return True
+
+    # 2. Try Resend HTTPS API
+    if send_http_email_resend(email, subject, html_content, text_content):
+        logger.info("Rejection email delivered via Resend HTTPS to %s", email)
+        return True
+
+    # 3. Fallback to standard Django mail
     try:
         send_mail(
             subject=subject,
             message=text_content,
+            html_message=html_content,
             from_email=from_email,
             recipient_list=[email],
             fail_silently=False,
@@ -500,9 +568,11 @@ def send_owner_more_info_email(email: str, username: str, property_name: str, me
     """
     Sends request for additional information or corrected documents.
     """
-    subject = "Additional Information Required — KirayaSetu Verification"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello,"
+    subject = "Additional Information Required — KirayaSaathi Verification"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    frontend_url = getattr(settings, "FRONTEND_URL", "https://kiraya-saathi-frontend.vercel.app").rstrip("/")
+    login_url = f"{frontend_url}/login"
+    greeting = f"Namaste {username}," if username else "Namaste,"
 
     text_content = f"""{greeting}
 
@@ -511,12 +581,23 @@ Our administrative team requires additional information to complete your propert
 Administrator's Request:
 {message}
 
-Please log in to your account at https://kirayasetu.com to review this request and upload the required documents.
+Please log in to your account at {login_url} to review this request and upload the required documents.
 
 Best regards,
-KirayaSetu Verification Team
+KirayaSaathi Verification Team
 """
 
+    html_content = f"""<div style="font-family:sans-serif;padding:20px;">
+<h3>KirayaSaathi Verification: More Information Required</h3>
+<p>{greeting}</p>
+<p>Administrative team request: <strong>{message}</strong></p>
+<p><a href="{login_url}">Click here to log in and upload documents</a></p>
+</div>"""
+
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        return True
+    if send_http_email_resend(email, subject, html_content, text_content):
+        return True
     try:
         send_mail(
             subject=subject,
@@ -535,25 +616,33 @@ def send_owner_suspension_email(email: str, username: str, reason: str) -> bool:
     """
     Sends notice when an owner's account access is temporarily suspended or put on hold.
     """
-    subject = "Notice: Your KirayaSetu Account is On Hold / Suspended"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello,"
+    subject = "Notice: Your KirayaSaathi Account is On Hold / Suspended"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    frontend_url = getattr(settings, "FRONTEND_URL", "https://kiraya-saathi-frontend.vercel.app").rstrip("/")
+    greeting = f"Namaste {username}," if username else "Namaste,"
 
     text_content = f"""{greeting}
 
-This is to inform you that your KirayaSetu owner workspace access has been placed ON HOLD / suspended by an administrator.
+This is to inform you that your KirayaSaathi owner workspace access has been placed ON HOLD / suspended by an administrator.
 
 Administrator's Note:
 {reason or 'Administrative compliance review in progress.'}
 
-While on hold, access to the owner dashboard and property records is temporarily restricted.
-To resolve this or review administrative feedback, please log in to your account at https://kirayasetu.com or contact support@kirayasetu.com.
-
 Best regards,
-KirayaSetu Compliance Team
-https://kirayasetu.com
+KirayaSaathi Compliance Team
 """
 
+    html_content = f"""<div style="font-family:sans-serif;padding:20px;">
+<h3>KirayaSaathi Account Notice</h3>
+<p>{greeting}</p>
+<p>Account status: On Hold / Suspended</p>
+<p>Reason: {reason}</p>
+</div>"""
+
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        return True
+    if send_http_email_resend(email, subject, html_content, text_content):
+        return True
     try:
         send_mail(
             subject=subject,
@@ -572,21 +661,34 @@ def send_owner_restoration_email(email: str, username: str) -> bool:
     """
     Sends notice when suspended access is restored.
     """
-    subject = "Notice: Your KirayaSetu Owner Access has been Restored"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello,"
+    subject = "Notice: Your KirayaSaathi Owner Access has been Restored"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    frontend_url = getattr(settings, "FRONTEND_URL", "https://kiraya-saathi-frontend.vercel.app").rstrip("/")
+    login_url = f"{frontend_url}/login"
+    greeting = f"Namaste {username}," if username else "Namaste,"
 
     text_content = f"""{greeting}
 
-Your KirayaSetu owner workspace access has been restored. You can now log in and continue managing your rental properties.
+Your KirayaSaathi owner workspace access has been restored. You can now log in and continue managing your rental properties.
 
 Login to Dashboard:
-https://kirayasetu.com/login
+{login_url}
 
 Best regards,
-Team KirayaSetu
+KirayaSaathi Team
 """
 
+    html_content = f"""<div style="font-family:sans-serif;padding:20px;">
+<h3>KirayaSaathi Access Restored</h3>
+<p>{greeting}</p>
+<p>Your owner workspace access has been restored.</p>
+<p><a href="{login_url}">Click here to log in to your Dashboard</a></p>
+</div>"""
+
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        return True
+    if send_http_email_resend(email, subject, html_content, text_content):
+        return True
     try:
         send_mail(
             subject=subject,
@@ -605,24 +707,34 @@ def send_owner_revocation_email(email: str, username: str, reason: str) -> bool:
     """
     Sends notice when access is permanently/administratively revoked.
     """
-    subject = "Notice: Your KirayaSetu Owner Authorization has been Revoked"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello,"
+    subject = "Notice: Your KirayaSaathi Owner Authorization has been Revoked"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    greeting = f"Namaste {username}," if username else "Namaste,"
 
     text_content = f"""{greeting}
 
-This notice confirms that your KirayaSetu owner workspace authorization has been revoked.
+This notice confirms that your KirayaSaathi owner workspace authorization has been revoked.
 
 Reason:
 {reason or 'Administrative policy decision.'}
 
 Your account is no longer authorized to use owner features.
-Contact support@kirayasetu.com if you require assistance.
+Contact kirayasaathi.support@gmail.com if you require assistance.
 
 Best regards,
-KirayaSetu Security & Administration
+KirayaSaathi Security & Administration
 """
 
+    html_content = f"""<div style="font-family:sans-serif;padding:20px;">
+<h3>KirayaSaathi Authorization Revoked</h3>
+<p>{greeting}</p>
+<p>Reason: {reason}</p>
+</div>"""
+
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        return True
+    if send_http_email_resend(email, subject, html_content, text_content):
+        return True
     try:
         send_mail(
             subject=subject,
@@ -641,21 +753,31 @@ def send_verification_request_received_email(email: str, username: str, property
     """
     Sends confirmation when an owner submits a new property verification request.
     """
-    subject = "Verification Request Received — KirayaSetu"
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSetu <no-reply@kirayasetu.com>")
-    greeting = f"Hello {username}," if username else "Hello,"
+    subject = "Verification Request Received — KirayaSaathi"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    greeting = f"Namaste {username}," if username else "Namaste,"
 
     text_content = f"""{greeting}
 
 Thank you for submitting your property ownership verification request for '{property_name}'.
 
 Our administrative verification team has received your documents and will review them shortly.
-You can monitor your request status in your KirayaSetu portal.
+You can monitor your request status in your KirayaSaathi portal.
 
 Best regards,
-KirayaSetu Verification Team
+KirayaSaathi Verification Team
 """
 
+    html_content = f"""<div style="font-family:sans-serif;padding:20px;">
+<h3>KirayaSaathi Verification Request Received</h3>
+<p>{greeting}</p>
+<p>We received your verification request for <strong>{property_name}</strong> and our team is reviewing it.</p>
+</div>"""
+
+    if send_http_email_brevo(email, subject, html_content, text_content):
+        return True
+    if send_http_email_resend(email, subject, html_content, text_content):
+        return True
     try:
         send_mail(
             subject=subject,

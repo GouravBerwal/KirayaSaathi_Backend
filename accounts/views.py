@@ -1,13 +1,15 @@
 import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from accounts.authentication import OWNER_SIGNER_SALT, ADMIN_SIGNER_SALT
 
 logger = logging.getLogger(__name__)
 from django.db import transaction
 from django.middleware.csrf import get_token
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
 
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
@@ -43,7 +45,7 @@ def get_client_ip(request) -> str:
     return request.META.get("REMOTE_ADDR")
 
 
-@method_decorator(csrf_protect, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class OwnerRegistrationView(APIView):
     """
     Register a new owner and initiate email OTP verification.
@@ -99,7 +101,7 @@ class OwnerRegistrationView(APIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-@method_decorator(csrf_protect, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class VerifyEmailOTPView(APIView):
     """
     Verify the 6-digit OTP code sent to owner's email address.
@@ -234,9 +236,18 @@ class VerifyEmailOTPView(APIView):
             # Log the owner in to establish session
             login(request._request, user)
 
+            signer = TimestampSigner(salt=OWNER_SIGNER_SALT)
+            auth_token = signer.sign_object({
+                "user_id": user.id,
+                "username": user.username,
+                "email": user.email,
+            })
+
             return Response(
                 {
                     "detail": "Email verified successfully.",
+                    "token": auth_token,
+                    "csrfToken": get_token(request._request),
                     "user": {
                         "id": user.id,
                         "username": user.username,
@@ -248,7 +259,7 @@ class VerifyEmailOTPView(APIView):
             )
 
 
-@method_decorator(csrf_protect, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class ResendEmailOTPView(APIView):
     """
     Resend a new OTP verification code to the owner's email address.
@@ -364,7 +375,7 @@ class CSRFTokenView(APIView):
         )
 
 
-@method_decorator(csrf_protect, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class OwnerLoginView(APIView):
     """
     Login using username or email and password.
@@ -388,9 +399,18 @@ class OwnerLoginView(APIView):
         user = serializer.validated_data["user"]
         login(request._request, user)
 
+        # Generate persistent token for cross-domain mobile support
+        signer = TimestampSigner(salt=OWNER_SIGNER_SALT)
+        auth_token = signer.sign_object({
+            "user_id": user.id,
+            "username": user.username,
+            "email": user.email,
+        })
+
         return Response(
             {
                 "detail": "Login successful.",
+                "token": auth_token,
                 "csrfToken": get_token(request._request),
                 "user": {
                     "id": user.id,
@@ -403,7 +423,7 @@ class OwnerLoginView(APIView):
         )
 
 
-@method_decorator(csrf_protect, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class OwnerLogoutView(APIView):
     """
     Logout the currently logged-in owner.
