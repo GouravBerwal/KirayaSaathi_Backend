@@ -302,6 +302,13 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-admin-token",
+    "x-auth-token",
+]
+
 _CONFIGURED_CSRF = env_list("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
     _DEFAULT_ORIGINS
