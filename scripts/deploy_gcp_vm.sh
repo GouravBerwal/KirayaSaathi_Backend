@@ -2,11 +2,11 @@
 set -e
 
 echo "============================================================"
-echo "🚀 KirayaSaathi — Google Cloud VM Automated Deployment Setup"
+echo "🚀 KirayaSaathi — Google Cloud VM Automated Setup"
 echo "============================================================"
 
-# 1. Setup 2GB Swap Memory (Prevents Out-Of-Memory crashes on e2-micro 1GB RAM)
-echo "[1/7] Configuring 2GB Swap space..."
+# 1. Setup 2GB Swap Memory (Prevents memory crash on e2-micro 1GB RAM)
+echo "[1/7] Configuring 2GB Swap space (Prevents memory crash)..."
 if [ ! -f /swapfile ]; then
     sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
     sudo chmod 600 /swapfile
@@ -15,30 +15,33 @@ if [ ! -f /swapfile ]; then
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
     sudo sysctl vm.swappiness=10
     echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
-    echo "✅ Swap memory enabled successfully!"
+    echo "✅ Swap memory enabled!"
 else
-    echo "ℹ️ Swap file already exists, skipping."
+    echo "ℹ️ Swap file already exists."
 fi
 
-# 2. Update and Install System Dependencies
-echo "[2/7] Installing system packages (Python, MySQL, Nginx, Git)..."
+# 2. Update and Install Python 3.12 + System Dependencies
+echo "[2/7] Installing Python 3.12, MySQL, Nginx, and Git..."
+sudo apt-get update -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common curl git
+sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    python3-pip python3-venv python3-dev \
-    mysql-server nginx git curl
+    python3.12 python3.12-venv python3.12-dev \
+    mysql-server nginx
 
 # 3. Configure MySQL Database
-echo "[3/7] Setting up local MySQL database (kiraya_db)..."
+echo "[3/7] Setting up MySQL database (kiraya_db)..."
 sudo systemctl enable --now mysql
 sudo mysql -e "CREATE DATABASE IF NOT EXISTS kiraya_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 sudo mysql -e "CREATE USER IF NOT EXISTS 'kiraya_user'@'localhost' IDENTIFIED BY 'KirayaSaathi#2026!Db';"
 sudo mysql -e "ALTER USER 'kiraya_user'@'localhost' IDENTIFIED BY 'KirayaSaathi#2026!Db';"
 sudo mysql -e "GRANT ALL PRIVILEGES ON kiraya_db.* TO 'kiraya_user'@'localhost';"
 sudo mysql -e "FLUSH PRIVILEGES;"
-echo "✅ MySQL database kiraya_db and user kiraya_user ready!"
+echo "✅ MySQL ready!"
 
 # 4. Clone or Pull KirayaSaathi Backend Repository
-echo "[4/7] Setting up KirayaSaathi Backend code..."
+echo "[4/7] Downloading KirayaSaathi Backend..."
 sudo mkdir -p /var/www/kirayasaathi
 sudo chown -R $USER:$USER /var/www/kirayasaathi
 cd /var/www/kirayasaathi
@@ -54,17 +57,15 @@ fi
 
 cd /var/www/kirayasaathi/backend
 
-# 5. Create Python Virtual Environment & Install Dependencies
-echo "[5/7] Setting up Python virtual environment and dependencies..."
-if [ ! -d "/var/www/kirayasaathi/venv" ]; then
-    python3 -m venv /var/www/kirayasaathi/venv
-fi
+# 5. Create Python 3.12 Virtual Environment & Install Dependencies
+echo "[5/7] Installing Python 3.12 dependencies & migrating database..."
+rm -rf /var/www/kirayasaathi/venv
+python3.12 -m venv /var/www/kirayasaathi/venv
 
 /var/www/kirayasaathi/venv/bin/pip install --upgrade pip
 /var/www/kirayasaathi/venv/bin/pip install -r requirements.txt
 
-# Create .env configuration
-cat << 'EOF' > /var/www/kirayasaathi/backend/.env
+cat << 'ENVEOF' > /var/www/kirayasaathi/backend/.env
 DEBUG=False
 SECRET_KEY=kirayasaathi-vm-gcp-2026-production-key-9a8b7c6d5e4f
 DJANGO_ALLOWED_HOSTS=*
@@ -83,15 +84,15 @@ EMAIL_HOST_USER=gouravberwal003@gmail.com
 DEFAULT_FROM_EMAIL=KirayaSaathi <gouravberwal003@gmail.com>
 BREVO_API_KEY=cM5tXVn5lhBKXX35QhNiaqfWq6ca2f6g9ADD3H7w3irVkQ9qjkyJufhdiRn2twnNI1Og1VemYSUAcm3P
 ALLOW_OTP_FALLBACK=True
-EOF
+ENVEOF
 
 mkdir -p /var/www/kirayasaathi/media /var/www/kirayasaathi/static
 /var/www/kirayasaathi/venv/bin/python manage.py migrate --noinput
 /var/www/kirayasaathi/venv/bin/python manage.py collectstatic --noinput
 
 # 6. Configure Systemd Service for Gunicorn (Runs 24x7)
-echo "[6/7] Setting up Gunicorn 24x7 systemd daemon..."
-sudo tee /etc/systemd/system/kirayasaathi.service > /dev/null << 'EOF'
+echo "[6/7] Setting up Gunicorn 24x7 service..."
+sudo tee /etc/systemd/system/kirayasaathi.service > /dev/null << 'SERVICEEOF'
 [Unit]
 Description=KirayaSaathi Gunicorn Application Daemon
 After=network.target mysql.service
@@ -101,20 +102,13 @@ User=www-data
 Group=www-data
 WorkingDirectory=/var/www/kirayasaathi/backend
 EnvironmentFile=/var/www/kirayasaathi/backend/.env
-ExecStart=/var/www/kirayasaathi/venv/bin/gunicorn \
-    --workers 2 \
-    --threads 2 \
-    --bind 127.0.0.1:8000 \
-    --timeout 120 \
-    --access-logfile - \
-    --error-logfile - \
-    config.wsgi:application
+ExecStart=/var/www/kirayasaathi/venv/bin/gunicorn --workers 2 --threads 2 --bind 127.0.0.1:8000 --timeout 120 config.wsgi:application
 Restart=always
 RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
-EOF
+SERVICEEOF
 
 sudo chown -R www-data:www-data /var/www/kirayasaathi
 sudo chmod -R 775 /var/www/kirayasaathi/media
@@ -122,9 +116,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now kirayasaathi
 sudo systemctl restart kirayasaathi
 
-# 7. Configure Nginx Reverse Proxy
-echo "[7/7] Configuring Nginx web server and media storage..."
-sudo tee /etc/nginx/sites-available/kirayasaathi > /dev/null << 'EOF'
+# 7. Configure Nginx Web Server
+echo "[7/7] Configuring Nginx Web Server..."
+sudo tee /etc/nginx/sites-available/kirayasaathi > /dev/null << 'NGINXEOF'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -135,13 +129,11 @@ server {
     location /static/ {
         alias /var/www/kirayasaathi/static/;
         expires 30d;
-        add_header Cache-Control "public, no-transform";
     }
 
     location /media/ {
         alias /var/www/kirayasaathi/media/;
         expires 30d;
-        add_header Cache-Control "public, no-transform";
     }
 
     location / {
@@ -154,7 +146,7 @@ server {
         proxy_connect_timeout 120s;
     }
 }
-EOF
+NGINXEOF
 
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -sf /etc/nginx/sites-available/kirayasaathi /etc/nginx/sites-enabled/
@@ -164,5 +156,5 @@ sudo systemctl restart nginx
 echo "============================================================"
 echo "🎉 SUCCESS! KirayaSaathi Backend & MySQL are now LIVE on VM!"
 echo "Server IP: $(curl -s ifconfig.me)"
-echo "Test URL: http://$(curl -s ifconfig.me)/api/auth/csrf/"
+echo "Test API: http://$(curl -s ifconfig.me)/api/auth/csrf/"
 echo "============================================================"
