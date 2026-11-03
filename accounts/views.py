@@ -272,7 +272,7 @@ class ResendEmailOTPView(APIView):
         serializer = ResendEmailOTPSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        email = serializer.validated_data["email"]
+        email = serializer.validated_data["email"].strip().lower()
 
         user = User.objects.filter(email__iexact=email).first()
         if user and getattr(getattr(user, "profile", None), "email_verified", False):
@@ -284,7 +284,16 @@ class ResendEmailOTPView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Enforce hourly rate limits first
+        if not user:
+            return Response(
+                {
+                    "detail": "User account not found for this email. Please sign up first.",
+                    "code": "USER_NOT_FOUND",
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Enforce hourly rate limits
         ip_address = get_client_ip(request)
         is_allowed, error_msg = check_rate_limits(email, ip_address)
         if not is_allowed:
@@ -296,9 +305,9 @@ class ResendEmailOTPView(APIView):
                 status=status.HTTP_429_TOO_MANY_REQUESTS,
             )
 
-        # Enforce 60-second resend cooldown
+        # Enforce resend cooldown with a 3-second grace buffer to handle network latency
         remaining_cooldown = get_remaining_cooldown(email)
-        if remaining_cooldown > 0:
+        if remaining_cooldown > 3:
             return Response(
                 {
                     "detail": f"Please wait {remaining_cooldown} seconds before requesting a new code.",
@@ -308,29 +317,25 @@ class ResendEmailOTPView(APIView):
                 status=status.HTTP_429_TOO_MANY_REQUESTS,
             )
 
-        # Issue new challenge if user exists
-        challenge = None
-        otp = ""
-        email_sent = True
-        if user:
-            user_agent = request.META.get("HTTP_USER_AGENT", "")
-            try:
-                challenge, otp = issue_otp_challenge(
-                    user=user,
-                    email=email,
-                    ip_address=ip_address,
-                    user_agent=user_agent,
-                )
-                email_sent = getattr(challenge, "email_sent", True)
-            except Exception as e:
-                logger.exception("Resend OTP failed: %s", e)
-                return Response(
-                    {
-                        "detail": "Failed to send verification email. Please try again.",
-                        "code": "EMAIL_DELIVERY_FAILED",
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
+        # Issue new challenge
+        user_agent = request.META.get("HTTP_USER_AGENT", "")
+        try:
+            challenge, otp = issue_otp_challenge(
+                user=user,
+                email=email,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+            email_sent = getattr(challenge, "email_sent", True)
+        except Exception as e:
+            logger.exception("Resend OTP failed: %s", e)
+            return Response(
+                {
+                    "detail": "Failed to send verification email. Please try again.",
+                    "code": "EMAIL_DELIVERY_FAILED",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         if not email_sent:
             return Response(

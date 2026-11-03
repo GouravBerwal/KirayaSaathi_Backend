@@ -17,11 +17,11 @@ from .models import EmailOTPChallenge, OwnerProfile
 
 logger = logging.getLogger(__name__)
 
-OTP_EXPIRY_MINUTES = 10
+OTP_EXPIRY_MINUTES = 30
 OTP_RESEND_COOLDOWN_SECONDS = 60
 OTP_MAX_ATTEMPTS = 5
 HOURLY_EMAIL_SEND_LIMIT = 5
-HOURLY_IP_SEND_LIMIT = 15
+HOURLY_IP_SEND_LIMIT = 20
 
 
 def generate_secure_otp(length: int = 6) -> str:
@@ -72,7 +72,7 @@ def mask_email(email: str) -> str:
 def get_remaining_cooldown(email: str) -> int:
     """
     Returns the remaining cooldown time in seconds before a new OTP can be requested.
-    Returns 0 if cooldown period has elapsed.
+    Returns 0 if cooldown period has elapsed, or if the challenge is expired or already consumed.
     """
     normalized_email = email.strip().lower()
     last_challenge = (
@@ -80,7 +80,7 @@ def get_remaining_cooldown(email: str) -> int:
         .order_by("-created_at")
         .first()
     )
-    if not last_challenge:
+    if not last_challenge or last_challenge.is_consumed or last_challenge.is_expired():
         return 0
 
     elapsed_seconds = (timezone.now() - last_challenge.created_at).total_seconds()
