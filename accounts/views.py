@@ -391,6 +391,7 @@ class OwnerLoginView(APIView):
         return Response(
             {
                 "detail": "Login successful.",
+                "csrfToken": get_token(request._request),
                 "user": {
                     "id": user.id,
                     "username": user.username,
