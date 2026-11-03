@@ -7,9 +7,13 @@ from .views import (
     AdminOwnerAccessActionView,
     AdminAuditLogListView,
     OwnerVerificationRequestDetailView,
+    AdminTokenLoginView,
+    AdminTokenMeView,
 )
 
 urlpatterns = [
+    path("auth/login/", AdminTokenLoginView.as_view(), name="admin-token-login"),
+    path("auth/me/", AdminTokenMeView.as_view(), name="admin-token-me"),
     path("verification-requests/", AdminVerificationRequestListView.as_view(), name="admin-verification-list"),
     path("verification-requests/<int:pk>/", OwnerVerificationRequestDetailView.as_view(), name="admin-verification-detail"),
     path("verification-requests/<int:pk>/review/", AdminVerificationReviewActionView.as_view(), name="admin-verification-review"),

@@ -1074,3 +1074,104 @@ class ContactInquiryView(APIView):
         )
 
 
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.contrib.auth import authenticate
+from .authentication import ADMIN_SIGNER_SALT
+
+
+class AdminTokenLoginView(APIView):
+    """
+    Dedicated Admin Login endpoint.
+    Returns a signed admin token header for the Admin Console.
+    CRITICAL: Does NOT call login(request, user), so it does NOT send a sessionid cookie.
+    This guarantees that the active browser session of any currently registered/logged-in
+    property owner remains 100% UNTOUCHED!
+    POST /api/admin/auth/login/
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        identifier = str(request.data.get("identifier", "")).strip()
+        password = str(request.data.get("password", ""))
+
+        if not identifier or not password:
+            return Response(
+                {"detail": "Administrator username/email and password are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = None
+        if "@" in identifier:
+            user_obj = User.objects.filter(email__iexact=identifier).first()
+            if user_obj:
+                user = authenticate(request=request._request, username=user_obj.username, password=password)
+        else:
+            user = authenticate(request=request._request, username=identifier, password=password)
+
+        if not user:
+            return Response(
+                {"detail": "Invalid administrator credentials. Please check your username and password."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not (user.is_staff or user.is_superuser):
+            return Response(
+                {"detail": "Access Denied: This portal requires administrator or staff privileges."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        signer = TimestampSigner(salt=ADMIN_SIGNER_SALT)
+        admin_token = signer.sign_object({"user_id": user.id, "username": user.username})
+
+        return Response(
+            {
+                "detail": "Admin authorized successfully.",
+                "admin_token": admin_token,
+                "admin_user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "is_staff": user.is_staff,
+                    "is_superuser": user.is_superuser,
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class AdminTokenMeView(APIView):
+    """
+    Check administrator token authorization status.
+    GET /api/admin/auth/me/
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        token = request.headers.get("X-Admin-Token") or request.META.get("HTTP_X_ADMIN_TOKEN")
+        if not token:
+            return Response({"authenticated": False}, status=status.HTTP_401_UNAUTHORIZED)
+
+        signer = TimestampSigner(salt=ADMIN_SIGNER_SALT)
+        try:
+            data = signer.unsign_object(token, max_age=86400)
+            user_id = data.get("user_id")
+            user = User.objects.filter(id=user_id, is_active=True).first()
+            if user and (user.is_staff or user.is_superuser):
+                return Response({
+                    "authenticated": True,
+                    "admin_user": {
+                        "id": user.id,
+                        "username": user.username,
+                        "email": user.email,
+                        "is_staff": user.is_staff,
+                        "is_superuser": user.is_superuser,
+                    }
+                })
+        except (BadSignature, SignatureExpired):
+            pass
+
+        return Response({"authenticated": False}, status=status.HTTP_401_UNAUTHORIZED)
+
+
