@@ -123,14 +123,14 @@ def check_rate_limits(email: str, ip_address: str = None) -> tuple[bool, str]:
 
 def render_otp_email_templates(otp: str, username: str = "") -> tuple[str, str]:
     """
-    Renders both plain-text and HTML versions of the KirayaSetu verification email.
+    Renders both plain-text and HTML versions of the KirayaSaathi verification email.
     Notice: Does NOT log the OTP.
     """
     greeting = f"Hello {username}," if username else "Hello,"
 
     text_content = f"""{greeting}
 
-Thank you for choosing KirayaSetu — India's Premier Rental Property Management Platform.
+Thank you for choosing KirayaSaathi — India's Premier Rental Property Management Platform.
 
 Your One-Time Password (OTP) for account verification is:
 
@@ -139,12 +139,12 @@ Your One-Time Password (OTP) for account verification is:
 This code is valid for {OTP_EXPIRY_MINUTES} minutes.
 
 SECURITY NOTICE:
-- Do NOT share this code with anyone, including KirayaSetu support.
+- Do NOT share this code with anyone, including KirayaSaathi support.
 - If you did not request this registration, please ignore this email.
 
 Best regards,
-Team KirayaSetu
-https://kirayasetu.com
+Team KirayaSaathi
+https://kirayasaathi.app
 """
 
     html_content = f"""<!DOCTYPE html>
@@ -152,14 +152,14 @@ https://kirayasetu.com
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KirayaSetu Email Verification</title>
+  <title>KirayaSaathi Email Verification</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #1e293b;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
     <!-- Header -->
     <tr>
       <td style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); padding: 32px 28px; text-align: center;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px;">KirayaSetu</h1>
+        <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px;">KirayaSaathi</h1>
         <p style="color: #e0e7ff; margin: 6px 0 0 0; font-size: 13px; font-weight: 500;">Rental Property Management Platform</p>
       </td>
     </tr>
@@ -169,7 +169,7 @@ https://kirayasetu.com
         <h2 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #0f172a;">Verify Your Email Address</h2>
         <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
           {greeting}<br>
-          Thank you for signing up as a property owner on KirayaSetu. Use the 6-digit verification code below to verify your email address:
+          Thank you for signing up as a property owner on KirayaSaathi. Use the 6-digit verification code below to verify your email address:
         </p>
         
         <!-- OTP Box -->
@@ -181,12 +181,12 @@ https://kirayasetu.com
         <!-- Security Warning Alert -->
         <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 4px; margin: 20px 0;">
           <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.5;">
-            <strong>Security Warning:</strong> Never share this code with anyone. KirayaSetu staff will never ask for your verification code.
+            <strong>Security Warning:</strong> Never share this code with anyone. KirayaSaathi staff will never ask for your verification code.
           </p>
         </div>
 
         <p style="margin: 20px 0 0 0; font-size: 13px; color: #64748b; line-height: 1.5;">
-          If you didn't create an account with KirayaSetu, you can safely ignore this email.
+          If you didn't create an account with KirayaSaathi, you can safely ignore this email.
         </p>
       </td>
     </tr>
@@ -194,7 +194,7 @@ https://kirayasetu.com
     <tr>
       <td style="background-color: #f8fafc; padding: 20px 28px; text-align: center; border-top: 1px solid #e2e8f0;">
         <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-          &copy; {timezone.now().year} KirayaSetu. All rights reserved.
+          &copy; {timezone.now().year} KirayaSaathi. All rights reserved.
         </p>
       </td>
     </tr>
@@ -297,7 +297,7 @@ def send_verification_email(email: str, otp: str, username: str = "") -> tuple[b
     Returns (success: bool, method_or_error: str).
     """
     text_content, html_content = render_otp_email_templates(otp, username)
-    subject = "Your KirayaSetu Verification Code"
+    subject = "Your KirayaSaathi Verification Code"
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
 
     # 1. Try Brevo HTTPS API first (Sends to ANY recipient in the world via Port 443)
@@ -375,7 +375,7 @@ def send_owner_approval_email(email: str, username: str, property_name: str = ""
     """
     Sends workspace approval email when an admin approves an owner verification request.
     Exact message required:
-    'Your KirayaSetu workspace is ready! You can now log in and start using your owner dashboard.'
+    'Your KirayaSaathi workspace is ready! You can now log in and start using your owner dashboard.'
     """
     subject = "Your KirayaSaathi Workspace is Ready! — Account Approved"
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")

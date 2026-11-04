@@ -1,4 +1,4 @@
-# KirayaSetu Backend — React Integration API Contract
+# KirayaSaathi Backend — React Integration API Contract
 
 **API version:** v1 (current Django URL layout; no `/v1/` prefix)  
 **Backend:** Django + Django REST Framework + MySQL  

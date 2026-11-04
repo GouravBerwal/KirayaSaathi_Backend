@@ -92,11 +92,28 @@ class WorkspaceSettingsView(APIView):
 
         saved_data = settings_obj.data or {}
 
+        # Intelligent defaults from user profile
+        user_full_name = f"{user.first_name} {user.last_name}".strip() or user.username
+        user_workspace = f"{user.username}'s Workspace"
+        user_email = user.email or ""
+
+        if hasattr(user, "ownership_requests"):
+            latest_req = user.ownership_requests.order_by("-id").first()
+            if latest_req and latest_req.property_name:
+                user_workspace = f"{latest_req.property_name} Workspace"
+
         # Existing saved settings ko defaults ke saath merge karo.
         data = {
             **DEFAULT_SETTINGS,
             **saved_data,
         }
+
+        if not data.get("fullName"):
+            data["fullName"] = user_full_name
+        if not data.get("email"):
+            data["email"] = user_email
+        if not data.get("workspaceName"):
+            data["workspaceName"] = user_workspace
 
         return settings_obj, data
 
@@ -140,6 +157,13 @@ class WorkspaceSettingsView(APIView):
         # Serializer validation ko intentionally preserve kiya gaya hai.
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        # Update user name if fullName provided
+        if incoming_data.get("fullName"):
+            parts = incoming_data["fullName"].strip().split(" ", 1)
+            request.user.first_name = parts[0]
+            request.user.last_name = parts[1] if len(parts) > 1 else ""
+            request.user.save(update_fields=["first_name", "last_name"])
 
         return Response({
             "message": "Settings saved successfully.",

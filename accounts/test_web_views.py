@@ -19,7 +19,7 @@ class WebViewsBaseTestCase(TestCase):
         self.password = "StrongPassword@2026"
         self.owner = User.objects.create_user(
             username="test_owner",
-            email="owner@kirayasetu.com",
+            email="owner@kirayasaathi.app",
             password=self.password,
             first_name="Rajesh",
             last_name="Mehta",
@@ -29,7 +29,7 @@ class WebViewsBaseTestCase(TestCase):
         # Another owner for isolation tests
         self.other_owner = User.objects.create_user(
             username="other_owner",
-            email="other@kirayasetu.com",
+            email="other@kirayasaathi.app",
             password=self.password,
             first_name="Vikram",
             last_name="Malhotra",
@@ -451,7 +451,7 @@ class InvoicesReportsNotificationsAndSearchTests(WebViewsBaseTestCase):
         response = self.client.get(reverse("settings"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "test_owner")
-        self.assertContains(response, "owner@kirayasetu.com")
+        self.assertContains(response, "owner@kirayasaathi.app")
 
     def test_global_search_endpoint(self):
         response = self.client.get(reverse("global_search") + "?q=Shanti")
@@ -464,7 +464,7 @@ class InvoicesReportsNotificationsAndSearchTests(WebViewsBaseTestCase):
         self.client.logout()
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "KirayaSetu")
+        self.assertContains(response, "KirayaSaathi")
 
     def test_authenticated_home_view_redirects_to_dashboard(self):
         self.client.login(username="test_owner", password=self.password)

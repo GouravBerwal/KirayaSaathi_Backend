@@ -166,7 +166,7 @@ def format_notification_text(notification):
     ctx = get_notification_context(notification)
     return (
         f"Namaste {ctx['tenant_name']} ji,\n\n"
-        f"Yeh KirayaSetu ki taraf se {ctx['title']} ki reminder hai:\n"
+        f"Yeh KirayaSaathi ki taraf se {ctx['title']} ki reminder hai:\n"
         f"• Property: {ctx['property_name']} (Room {ctx['room_number']})\n"
         f"• Pending Amount: Rs. {ctx['amount_due']}\n"
         f"• Due Date: {ctx['due_date']}\n\n"
@@ -225,7 +225,7 @@ def send_actual_notification(notification, channel="WHATSAPP"):
                     send_mail(
                         subject=subject,
                         message=text,
-                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasetu.com"),
+                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasaathi.app"),
                         recipient_list=[recipient_email],
                         fail_silently=True,
                     )
@@ -280,7 +280,7 @@ def send_actual_notification(notification, channel="WHATSAPP"):
             send_mail(
                 subject=subject,
                 message=text,
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasetu.com"),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@kirayasaathi.app"),
                 recipient_list=[recipient_email],
                 fail_silently=False,
             )

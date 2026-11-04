@@ -403,7 +403,7 @@ class OwnerEmailOTPVerificationTests(APITestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_mail = mail.outbox[0]
         self.assertIn(self.email, sent_mail.to)
-        self.assertIn("Your KirayaSetu Verification Code", sent_mail.subject)
+        self.assertIn("Your KirayaSaathi Verification Code", sent_mail.subject)
         otp = self.extract_otp(sent_mail)
         self.assertEqual(len(otp), 6)
         self.assertTrue(otp.isdigit())
@@ -839,7 +839,7 @@ class OwnerApprovalWorkflowTests(APITestCase):
         # Create admin user
         self.admin_user = User.objects.create_superuser(
             username="admin_user",
-            email="admin@kirayasetu.com",
+            email="admin@kirayasaathi.app",
             password=self.password,
         )
 

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: kirayasetu-backend
+    name: kirayasaathi-backend
     runtime: python
     buildCommand: bash build.sh
     startCommand: gunicorn config.wsgi:application

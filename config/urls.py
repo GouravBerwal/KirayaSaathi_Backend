@@ -1,5 +1,5 @@
 """
-URL configuration for KirayaSetu project.
+URL configuration for KirayaSaathi project.
 Combines Django REST Framework APIs and integrated web application views.
 """
 from django.contrib import admin
@@ -12,7 +12,7 @@ from config import web_views
 
 def health_check(request):
     """Health check endpoint for Render / cloud monitoring."""
-    return JsonResponse({"status": "ok", "service": "kirayasetu-api"})
+    return JsonResponse({"status": "ok", "service": "kirayasaathi-api"})
 
 urlpatterns = [
     # Health checks for deployment

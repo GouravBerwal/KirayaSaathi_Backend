@@ -1,5 +1,5 @@
 """
-Web views for KirayaSetu web application.
+Web views for KirayaSaathi web application.
 Handles template rendering, forms, database queries, and owner isolation.
 """
 
@@ -126,7 +126,7 @@ def register_view(request):
         else:
             user = User.objects.create_user(username=username, email=email, password=password)
             login(request, user)
-            messages.success(request, "Account created successfully! Welcome to KirayaSetu.")
+            messages.success(request, "Account created successfully! Welcome to KirayaSaathi.")
             return redirect("dashboard")
 
     return render(request, "auth/register.html", {

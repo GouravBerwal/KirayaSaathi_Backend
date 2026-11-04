@@ -1,6 +1,6 @@
 
 """
-Django settings for KirayaSetu project.
+Django settings for KirayaSaathi project.
 """
 
 import os
@@ -82,7 +82,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
 
-    # KirayaSetu apps
+    # KirayaSaathi apps
     "properties",
     "tenants",
     "billing",

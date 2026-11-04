@@ -1,4 +1,4 @@
-# KirayaSetu Django Backend
+# KirayaSaathi Django Backend
 
 Django REST Framework backend for rental properties, rooms, tenants, rental agreements, rent records, electricity metering/billing, payments, dashboards, and owner notifications.
 

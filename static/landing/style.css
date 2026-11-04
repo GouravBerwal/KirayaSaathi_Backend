@@ -129,7 +129,7 @@ body {
 /* ==========================================
         BUTTON SYSTEM (CUSTOM - SAFE)
 ========================================== */
-.kirayasetu-btn-primary {
+.kirayasaathi-btn-primary {
     background: var(--primary);
     border: none;
     border-radius: 10px;
@@ -139,7 +139,7 @@ body {
     transition: 0.3s;
 }
 
-.kirayasetu-btn-primary:hover {
+.kirayasaathi-btn-primary:hover {
     background: #02495f;
 }
 

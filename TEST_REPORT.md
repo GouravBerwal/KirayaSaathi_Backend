@@ -1,4 +1,4 @@
-# KirayaSetu Backend — Verification Report
+# KirayaSaathi Backend — Verification Report
 
 ## Checks performed on the delivered source
 

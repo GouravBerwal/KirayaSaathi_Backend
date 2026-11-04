@@ -1092,7 +1092,7 @@ class ContactInquiryView(APIView):
 
         return Response(
             {
-                "detail": "Thank you! Your inquiry has been received. Our KirayaSetu support team will contact you shortly.",
+                "detail": "Thank you! Your inquiry has been received. Our KirayaSaathi support team will contact you shortly.",
                 "status": "SUCCESS",
             },
             status=status.HTTP_200_OK,
