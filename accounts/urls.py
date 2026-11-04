@@ -8,6 +8,8 @@ from .views import (
     OwnerRegistrationView,
     ResendEmailOTPView,
     VerifyEmailOTPView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
     OwnerVerificationRequestListCreateView,
     OwnerVerificationRequestDetailView,
     SecureDocumentDownloadView,
@@ -23,6 +25,8 @@ urlpatterns = [
     path("login/", OwnerLoginView.as_view(), name="owner-login"),
     path("logout/", OwnerLogoutView.as_view(), name="owner-logout"),
     path("me/", OwnerMeView.as_view(), name="owner-me"),
+    path("password-reset-request/", PasswordResetRequestView.as_view(), name="password-reset-request"),
+    path("password-reset-confirm/", PasswordResetConfirmView.as_view(), name="password-reset-confirm"),
     path("contact/", ContactInquiryView.as_view(), name="contact-inquiry"),
 
     # Property Ownership Verification

@@ -791,3 +791,90 @@ KirayaSaathi Verification Team
         logger.error(f"Failed to send request received email to {email}: {e}")
         return False
 
+
+def send_password_reset_email(user, reset_url: str) -> bool:
+    """
+    Sends a password reset link to the user's registered Gmail address.
+    """
+    subject = "Reset Your KirayaSaathi Password"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "KirayaSaathi <kirayasaathi.support@gmail.com>")
+    name = (user.first_name or user.username or "Property Owner").strip()
+
+    text_content = f"""Namaste {name},
+
+We received a request to reset your KirayaSaathi account password.
+
+Please click the link below to set a new password:
+{reset_url}
+
+This link is valid for 24 hours.
+
+If you did not request a password reset, please ignore this email. Your password will remain unchanged.
+
+Best regards,
+KirayaSaathi Support Team
+https://kirayasaathi.app
+"""
+
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Reset Password</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; padding: 24px; color: #1e293b;">
+  <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 580px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+    <tr>
+      <td style="background: linear-gradient(135deg, #035E7B 0%, #00877C 100%); padding: 32px 28px; text-align: center;">
+        <h1 style="color: #fff; margin: 0; font-size: 24px; font-weight: 700;">KirayaSaathi</h1>
+        <p style="color: #e6fffa; margin: 6px 0 0; font-size: 13px;">Password Reset Request</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 32px 28px;">
+        <h2 style="color: #035E7B; margin: 0 0 16px; font-size: 20px;">Reset Your Password</h2>
+        <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+          Namaste <strong>{name}</strong>,<br><br>
+          Aapke KirayaSaathi account ka password reset karne ki request receive hui hai. Naya password set karne ke liye neeche diye gaye button par click karein:
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="{reset_url}" style="background: #035E7B; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(3, 94, 123, 0.25);">
+            Reset Password
+          </a>
+        </div>
+        <p style="font-size: 13px; color: #64748b; line-height: 1.5;">
+          Agar button click nahi ho raha hai, toh yeh link copy karke apne browser me paste karein:<br>
+          <a href="{reset_url}" style="color: #035E7B; word-break: break-all;">{reset_url}</a>
+        </p>
+        <div style="background: #f1f5f9; padding: 12px 16px; border-radius: 6px; margin: 24px 0;">
+          <p style="margin: 0; font-size: 12px; color: #64748b;">
+            ⚠️ <em>Yeh link 24 ghante ke liye valid hai. Agar aapne yeh request nahi ki thi, toh is email ko ignore kar sakte hain. Aapka account poori tarah surakshit hai.</em>
+          </p>
+        </div>
+        <p style="font-size: 13px; color: #475569; margin-top: 24px;">
+          Best regards,<br>
+          <strong>KirayaSaathi Support Team</strong>
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+    if send_http_email_brevo(user.email, subject, html_content, text_content):
+        return True
+    if send_http_email_resend(user.email, subject, html_content, text_content):
+        return True
+    try:
+        send_mail(
+            subject=subject,
+            message=text_content,
+            html_message=html_content,
+            from_email=from_email,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        logger.info("Password reset email delivered to %s", user.email)
+        return True
+    except Exception as e:
+        logger.exception("Failed to send password reset email to %s: %s", user.email, e)
+        return False
+
+

@@ -33,7 +33,11 @@ from .services import (
     issue_otp_challenge,
     mask_email,
     verify_otp_hash,
+    send_password_reset_email,
 )
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 
 User = get_user_model()
 
@@ -466,10 +470,19 @@ class OwnerMeView(APIView):
     Return the currently logged-in user's details, approval status, and access status.
     GET /api/auth/me/
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         user = request.user
+        if not user or not user.is_authenticated:
+            return Response(
+                {
+                    "authenticated": False,
+                    "id": None,
+                    "detail": "Not authenticated.",
+                },
+                status=status.HTTP_200_OK,
+            )
 
         first_name = (user.first_name or "").strip()
         last_name = (user.last_name or "").strip()
@@ -504,6 +517,7 @@ class OwnerMeView(APIView):
 
         return Response(
             {
+                "authenticated": True,
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
@@ -521,6 +535,122 @@ class OwnerMeView(APIView):
                 "revocation_reason": revocation_reason,
                 "rejection_reason": rejection_reason,
                 "latest_request": latest_req_data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class PasswordResetRequestView(APIView):
+    """
+    Initiates a password reset flow by sending a secure reset link to the user's Gmail.
+    POST /api/auth/password-reset-request/
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        identifier = (request.data.get("identifier") or request.data.get("email") or "").strip()
+        if not identifier:
+            return Response(
+                {"detail": "Kripya apna registered email ya username enter karein."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = User.objects.filter(email__iexact=identifier).first()
+        if not user:
+            user = User.objects.filter(username__iexact=identifier).first()
+
+        if user and user.email:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            frontend_url = getattr(settings, "FRONTEND_URL", "https://kirayasaathi.app").rstrip("/")
+            reset_url = f"{frontend_url}/login?mode=reset_password&uid={uid}&token={token}"
+
+            sent = send_password_reset_email(user, reset_url)
+            if not sent:
+                return Response(
+                    {"detail": "Reset link bhejne me samasya aayi. Kripya thodi der baad koshish karein."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        return Response(
+            {
+                "detail": "Password reset link aapke Gmail inbox par bhej di gayi hai. Kripya apna email check karein.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class PasswordResetConfirmView(APIView):
+    """
+    Confirms password reset using uid and token and sets a new password in MySQL.
+    POST /api/auth/password-reset-confirm/
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        uid = request.data.get("uid")
+        token = request.data.get("token")
+        new_password = request.data.get("new_password") or request.data.get("password")
+        confirm_password = request.data.get("confirm_password")
+
+        if not uid or not token:
+            return Response(
+                {"detail": "Password reset link invalid hai ya parameters missing hain."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not new_password:
+            return Response(
+                {"detail": "Kripya naya password enter karein."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if confirm_password and new_password != confirm_password:
+            return Response(
+                {"detail": "Passwords match nahi ho rahe hain."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if len(new_password) < 8:
+            return Response(
+                {"detail": "Password kam se kam 8 characters ka hona chahiye."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response(
+                {"detail": "Password reset link invalid hai ya expire ho chuka hai."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not default_token_generator.check_token(user, token):
+            return Response(
+                {"detail": "Password reset link expire ho chuka hai ya pehle hi use kiya ja chuka hai. Kripya naya link request karein."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(new_password)
+        if not user.is_active:
+            user.is_active = True
+        user.save()
+
+        # Ensure profile email is marked verified
+        profile = getattr(user, "profile", None)
+        if profile and not profile.email_verified:
+            profile.email_verified = True
+            profile.save(update_fields=["email_verified"])
+
+        logger.info("Password reset successfully for user %s (%s)", user.username, user.email)
+        return Response(
+            {
+                "detail": "Aapka password safaltapoorvak update ho gaya hai! Ab aap naye password se login kar sakte hain.",
             },
             status=status.HTTP_200_OK,
         )
