@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model, password_validation
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import transaction
+from django.db import models, transaction
 from django.utils import timezone
 from rest_framework import serializers, status
 from rest_framework.exceptions import APIException
@@ -64,7 +64,8 @@ class OwnerRegistrationSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("Username is required.")
 
-        if User.objects.filter(username__iexact=value).exists():
+        existing = User.objects.filter(username__iexact=value).first()
+        if existing and getattr(getattr(existing, "profile", None), "email_verified", False):
             raise serializers.ValidationError(
                 "This username is already registered."
             )
@@ -75,7 +76,8 @@ class OwnerRegistrationSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("Email is required.")
 
-        if User.objects.filter(email__iexact=value).exists():
+        existing = User.objects.filter(email__iexact=value).first()
+        if existing and getattr(getattr(existing, "profile", None), "email_verified", False):
             raise serializers.ValidationError(
                 "This email is already registered."
             )
@@ -105,6 +107,15 @@ class OwnerRegistrationSerializer(serializers.ModelSerializer):
         last_name = validated_data.pop("last_name", "")
 
         with transaction.atomic():
+            # If an unverified user exists with the same username or email, clean up to allow clean re-registration
+            stale_users = User.objects.filter(
+                models.Q(email__iexact=validated_data["email"].strip()) |
+                models.Q(username__iexact=validated_data["username"].strip())
+            )
+            for stale in stale_users:
+                if not getattr(getattr(stale, "profile", None), "email_verified", False):
+                    stale.delete()
+
             user = User(
                 username=validated_data["username"],
                 email=validated_data["email"].strip().lower(),

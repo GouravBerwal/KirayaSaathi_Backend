@@ -80,9 +80,9 @@ DB_PASSWORD=KirayaSaathi#2026!Db
 DB_HOST=127.0.0.1
 DB_PORT=3306
 
-EMAIL_HOST_USER=gouravberwal003@gmail.com
-DEFAULT_FROM_EMAIL=KirayaSaathi <gouravberwal003@gmail.com>
-BREVO_API_KEY=cM5tXVn5lhBKXX35QhNiaqfWq6ca2f6g9ADD3H7w3irVkQ9qjkyJufhdiRn2twnNI1Og1VemYSUAcm3P
+EMAIL_HOST_USER=kirayasaathi.support@gmail.com
+EMAIL_HOST_PASSWORD=tvlybnzksxcbxbdf
+DEFAULT_FROM_EMAIL=KirayaSaathi <kirayasaathi.support@gmail.com>
 ALLOW_OTP_FALLBACK=True
 ENVEOF
 
