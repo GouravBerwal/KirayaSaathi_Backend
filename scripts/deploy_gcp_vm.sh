@@ -87,6 +87,10 @@ ALLOW_OTP_FALLBACK=True
 ENVEOF
 
 mkdir -p /var/www/kirayasaathi/media /var/www/kirayasaathi/static
+if [ -f "/var/www/kirayasaathi/backend/kiraya_clean_for_cloud.sql" ]; then
+    echo "Importing original MySQL database..."
+    sudo mysql kiraya_db < /var/www/kirayasaathi/backend/kiraya_clean_for_cloud.sql
+fi
 /var/www/kirayasaathi/venv/bin/python manage.py migrate --noinput
 /var/www/kirayasaathi/venv/bin/python manage.py collectstatic --noinput
 

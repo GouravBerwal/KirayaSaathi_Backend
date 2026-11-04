@@ -101,7 +101,7 @@ class OwnerRegistrationView(APIView):
             "masked_email": mask_email(user.email),
             "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
             "expires_in_minutes": OTP_EXPIRY_MINUTES,
-            "fallback_otp": otp if (not email_sent or allow_fallback) else None,
+            "fallback_otp": otp if not email_sent else None,
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -367,7 +367,7 @@ class ResendEmailOTPView(APIView):
             "masked_email": mask_email(email),
             "cooldown_seconds": OTP_RESEND_COOLDOWN_SECONDS,
             "expires_in_minutes": OTP_EXPIRY_MINUTES,
-            "fallback_otp": otp if (not email_sent or allow_fallback) else None,
+            "fallback_otp": otp if not email_sent else None,
         }
 
         return Response(
