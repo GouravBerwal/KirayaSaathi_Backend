@@ -10,6 +10,11 @@ from .views import (
     AdminTokenLoginView,
     AdminTokenMeView,
 )
+from blogs.views import (
+    AdminBlogPostListCreateView,
+    AdminBlogPostDetailView,
+    AdminBlogImageUploadView,
+)
 
 urlpatterns = [
     path("auth/login/", AdminTokenLoginView.as_view(), name="admin-token-login"),
@@ -20,4 +25,8 @@ urlpatterns = [
     path("owners/", AdminOwnerListView.as_view(), name="admin-owner-list"),
     path("owners/<int:user_id>/manage-access/", AdminOwnerAccessActionView.as_view(), name="admin-owner-manage-access"),
     path("audit-logs/", AdminAuditLogListView.as_view(), name="admin-audit-logs"),
+    # Blog administration
+    path("blogs/", AdminBlogPostListCreateView.as_view(), name="admin-blog-list-create"),
+    path("blogs/<int:pk>/", AdminBlogPostDetailView.as_view(), name="admin-blog-detail"),
+    path("blogs/upload-image/", AdminBlogImageUploadView.as_view(), name="admin-blog-upload-image"),
 ]

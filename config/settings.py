@@ -91,7 +91,8 @@ INSTALLED_APPS = [
     "dashboard",
     "notifications",
     "accounts",
-    "reporting"
+    "reporting",
+    "blogs",
 ]
 
 
