@@ -109,6 +109,11 @@ class BlogPostPublicDetailView(APIView):
     def get(self, request, slug):
         post = BlogPost.objects.filter(slug=slug, is_published=True).first()
         if not post:
+            # Check if user is staff/admin previewing a draft/hidden article
+            if verify_admin_token(request):
+                post = BlogPost.objects.filter(slug=slug).first()
+
+        if not post:
             return Response(
                 {"detail": "Blog article not found or has been removed."},
                 status=status.HTTP_404_NOT_FOUND,

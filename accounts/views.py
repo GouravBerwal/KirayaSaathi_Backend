@@ -515,6 +515,10 @@ class OwnerMeView(APIView):
                 "rejection_reason": latest_req.rejection_reason,
             }
 
+        admin_token = None
+        if user.is_staff or user.is_superuser:
+            admin_token = TimestampSigner(salt=ADMIN_SIGNER_SALT).sign_object({"user_id": user.id})
+
         return Response(
             {
                 "authenticated": True,
@@ -526,6 +530,7 @@ class OwnerMeView(APIView):
                 "full_name": full_name,
                 "is_staff": user.is_staff,
                 "is_superuser": user.is_superuser,
+                "admin_token": admin_token,
                 "email_verified": email_verified,
                 "approval_status": approval_status,
                 "access_status": access_status,
