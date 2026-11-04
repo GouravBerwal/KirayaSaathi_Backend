@@ -550,33 +550,47 @@ class PasswordResetRequestView(APIView):
     authentication_classes = []
 
     def post(self, request):
-        identifier = (request.data.get("identifier") or request.data.get("email") or "").strip()
+        identifier = (request.data.get("identifier") or request.data.get("email") or request.data.get("username") or "").strip()
         if not identifier:
             return Response(
-                {"detail": "Kripya apna registered email ya username enter karein."},
+                {"detail": "Kripya apna registered username ya account ID enter karein."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = User.objects.filter(email__iexact=identifier).first()
+        user = User.objects.filter(username__iexact=identifier).first()
         if not user:
-            user = User.objects.filter(username__iexact=identifier).first()
+            user = User.objects.filter(email__iexact=identifier).first()
 
-        if user and user.email:
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            frontend_url = getattr(settings, "FRONTEND_URL", "https://kirayasaathi.app").rstrip("/")
-            reset_url = f"{frontend_url}/login?mode=reset_password&uid={uid}&token={token}"
+        if not user:
+            return Response(
+                {"detail": f"'{identifier}' account hamare database me nahi mila. Kripya sahi username enter karein."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
-            sent = send_password_reset_email(user, reset_url)
-            if not sent:
-                return Response(
-                    {"detail": "Reset link bhejne me samasya aayi. Kripya thodi der baad koshish karein."},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
+        if not user.email:
+            return Response(
+                {"detail": f"'{user.username}' account ke saath koi email linked nahi hai. Kripya support team se sampark karein."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        frontend_url = getattr(settings, "FRONTEND_URL", "https://kirayasaathi.app").rstrip("/")
+        reset_url = f"{frontend_url}/login?mode=reset_password&uid={uid}&token={token}"
+
+        sent = send_password_reset_email(user, reset_url)
+        if not sent:
+            return Response(
+                {"detail": "Reset link bhejne me samasya aayi. Kripya thodi der baad dobara koshish karein."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        masked = mask_email(user.email)
         return Response(
             {
-                "detail": "Password reset link aapke Gmail inbox par bhej di gayi hai. Kripya apna email check karein.",
+                "detail": f"Password reset link is account ki registered Gmail ({masked}) par bhej di gayi hai! Kripya apna Gmail inbox check karein.",
+                "masked_email": masked,
+                "username": user.username,
             },
             status=status.HTTP_200_OK,
         )
