@@ -76,7 +76,7 @@ ARTICLES = [
         "read_time": "8 min read",
         "tags": "Rent Agreement, Indian Rental Laws, 11 Month Agreement, Police Verification, Stamp Duty",
         "is_featured": False,
-        "is_published": True,
+        "is_published": False,
         "views_count": 2180,
         "content": """
 <h2>Why Are Most Rental Agreements in India Signed for 11 Months?</h2>
@@ -108,7 +108,7 @@ ARTICLES = [
         "read_time": "5 min read",
         "tags": "Tenant Screening, PG Verification, Tenant Background Check, Rental Safety",
         "is_featured": False,
-        "is_published": True,
+        "is_published": False,
         "views_count": 980,
         "content": """
 <h2>Screening Before Handing Over the Keys Saves Months of Headaches</h2>
@@ -143,7 +143,7 @@ ARTICLES = [
         "read_time": "7 min read",
         "tags": "Hostel Vacancy, PG Occupancy, Rental Business India, Student Housing, HRA Receipts",
         "is_featured": False,
-        "is_published": True,
+        "is_published": False,
         "views_count": 1740,
         "content": """
 <h2>The Cost of an Empty Bed in a Student Hostel or PG</h2>
