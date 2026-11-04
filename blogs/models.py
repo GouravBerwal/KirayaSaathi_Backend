@@ -26,8 +26,8 @@ class BlogPost(models.Model):
         default="",
         help_text="URL or path to high-res article cover image",
     )
-    author_name = models.CharField(max_length=100, default="KirayaSaathi Editorial Team")
-    author_role = models.CharField(max_length=100, default="Real Estate & Rental Specialist")
+    author_name = models.CharField(max_length=100, default="Gourav Berwal")
+    author_role = models.CharField(max_length=100, default="Founder & Creator of KirayaSaathi")
     read_time = models.CharField(max_length=50, default="5 min read")
     tags = models.CharField(max_length=255, blank=True, default="", help_text="Comma-separated tags")
     is_published = models.BooleanField(default=True, db_index=True)
