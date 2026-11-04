@@ -23,22 +23,43 @@ User = get_user_model()
 
 
 def verify_admin_token(request) -> bool:
-    """Validate X-Admin-Token header or standard superuser session."""
+    """Validate X-Admin-Token, Bearer token, X-Auth-Token, or superuser session."""
     if request.user and request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
         return True
 
-    token = request.headers.get("X-Admin-Token") or request.META.get("HTTP_X_ADMIN_TOKEN")
-    if not token:
-        return False
+    # 1. Dedicated Admin Token
+    admin_token = request.headers.get("X-Admin-Token") or request.META.get("HTTP_X_ADMIN_TOKEN")
+    if admin_token:
+        signer = TimestampSigner(salt=ADMIN_SIGNER_SALT)
+        try:
+            data = signer.unsign_object(admin_token, max_age=86400 * 7)
+            user_id = data.get("user_id")
+            user = User.objects.filter(id=user_id, is_active=True).first()
+            if user and (user.is_staff or user.is_superuser):
+                return True
+        except (BadSignature, SignatureExpired):
+            pass
 
-    signer = TimestampSigner(salt=ADMIN_SIGNER_SALT)
-    try:
-        data = signer.unsign_object(token, max_age=86400 * 7)
-        user_id = data.get("user_id")
-        user = User.objects.filter(id=user_id, is_active=True).first()
-        return bool(user and (user.is_staff or user.is_superuser))
-    except (BadSignature, SignatureExpired):
-        return False
+    # 2. Main Auth Token (Owner/Superuser from localStorage)
+    auth_token = request.headers.get("X-Auth-Token") or request.META.get("HTTP_X_AUTH_TOKEN")
+    if not auth_token:
+        auth_header = request.headers.get("Authorization") or request.META.get("HTTP_AUTHORIZATION")
+        if auth_header and auth_header.startswith("Bearer "):
+            auth_token = auth_header[7:].strip()
+
+    if auth_token:
+        from accounts.authentication import OWNER_SIGNER_SALT
+        signer = TimestampSigner(salt=OWNER_SIGNER_SALT)
+        try:
+            data = signer.unsign_object(auth_token, max_age=86400 * 30)
+            user_id = data.get("user_id")
+            user = User.objects.filter(id=user_id, is_active=True).first()
+            if user and (user.is_staff or user.is_superuser):
+                return True
+        except (BadSignature, SignatureExpired):
+            pass
+
+    return False
 
 
 # =========================================================================
@@ -188,6 +209,25 @@ class AdminBlogPostDetailView(APIView):
         if not post:
             return Response({"detail": "Blog not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        # Allow direct fast partial update of boolean flags like is_published or is_featured
+        if "is_published" in request.data and len(request.data) == 1:
+            val = bool(request.data["is_published"])
+            post.is_published = val
+            post.save(update_fields=["is_published", "updated_at"])
+            return Response({
+                "detail": "Blog visibility updated successfully!",
+                "blog": BlogPostAdminSerializer(post).data,
+            })
+
+        if "is_featured" in request.data and len(request.data) == 1:
+            val = bool(request.data["is_featured"])
+            post.is_featured = val
+            post.save(update_fields=["is_featured", "updated_at"])
+            return Response({
+                "detail": "Blog featured status updated successfully!",
+                "blog": BlogPostAdminSerializer(post).data,
+            })
+
         serializer = BlogPostAdminSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
             updated = serializer.save()
@@ -196,6 +236,9 @@ class AdminBlogPostDetailView(APIView):
                 "blog": BlogPostAdminSerializer(updated).data,
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        return self.put(request, pk)
 
     def delete(self, request, pk):
         if not verify_admin_token(request):

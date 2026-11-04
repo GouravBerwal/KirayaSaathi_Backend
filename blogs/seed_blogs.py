@@ -21,7 +21,7 @@ ARTICLES = [
     "tags": "Electricity Submeter, Smart Rental and Tenant Management System, Submeter Billing Formula India, Hostel Management, PG Management, Landlord Electricity Rules, Electricity Act 2003, Rent Calculation",
     "is_featured": True,
     "is_published": True,
-    "views_count": 1640,
+    "views_count": 0,
     "content": """
 <h2>1. Executive Summary: The ₹12,000/Month Hidden Friction in Indian Rentals</h2>
 <p>In the Indian rental ecosystem—encompassing student hostels in coaching hubs like Kota and Indore, paying guest (PG) accommodations in Bengaluru and Pune, and multi-unit residential properties in Delhi NCR and Mumbai—<strong>electricity submeter calculation is the primary catalyst for landlord-tenant friction</strong>.</p>
@@ -137,7 +137,7 @@ ARTICLES = [
         "tags": "Rent Agreement, Indian Rental Laws, 11 Month Agreement, Police Verification, Stamp Duty",
         "is_featured": False,
         "is_published": False,
-        "views_count": 2180,
+        "views_count": 0,
         "content": """
 <h2>Why Are Most Rental Agreements in India Signed for 11 Months?</h2>
 <p>Under <strong>Section 17 of the Registration Act, 1908</strong>, any lease or tenancy agreement for immovable property that exceeds 11 months (i.e. 12 months or longer) is <em>legally required to be officially registered</em> with the local Sub-Registrar of Assurances.</p>
@@ -169,7 +169,7 @@ ARTICLES = [
         "tags": "Tenant Screening, PG Verification, Tenant Background Check, Rental Safety",
         "is_featured": False,
         "is_published": False,
-        "views_count": 980,
+        "views_count": 0,
         "content": """
 <h2>Screening Before Handing Over the Keys Saves Months of Headaches</h2>
 <p>Every experienced property owner in India knows: <em>It is ten times easier to reject an unsuitable tenant before move-in than to evict a defaulting tenant after move-in.</em></p>
@@ -204,7 +204,7 @@ ARTICLES = [
         "tags": "Hostel Vacancy, PG Occupancy, Rental Business India, Student Housing, HRA Receipts",
         "is_featured": False,
         "is_published": False,
-        "views_count": 1740,
+        "views_count": 0,
         "content": """
 <h2>The Cost of an Empty Bed in a Student Hostel or PG</h2>
 <p>In student hubs like Kota, Indore, Pune, Bengaluru, and Delhi Mukherjee Nagar, every vacant bed represents a permanent loss of ₹5,000 to ₹12,000 per month that can never be recovered.</p>
