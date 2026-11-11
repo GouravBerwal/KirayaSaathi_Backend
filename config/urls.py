@@ -2,19 +2,37 @@
 URL configuration for KirayaSaathi project.
 Combines Django REST Framework APIs and integrated web application views.
 """
+import os
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from config import web_views
 
 def health_check(request):
     """Health check endpoint for Render / cloud monitoring."""
     return JsonResponse({"status": "ok", "service": "kirayasaathi-api"})
 
+def favicon_view(request):
+    favicon_path = os.path.join(settings.BASE_DIR, "static", "favicon.ico")
+    if os.path.exists(favicon_path):
+        return FileResponse(open(favicon_path, "rb"), content_type="image/x-icon")
+    return HttpResponse(status=404)
+
+def robots_txt_view(request):
+    lines = [
+        "User-agent: *",
+        "Disallow: /",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
 urlpatterns = [
+    # Favicon and Robots for Search Engines
+    path("favicon.ico", favicon_view, name="favicon"),
+    path("robots.txt", robots_txt_view, name="robots-txt"),
+
     # Health checks for deployment
     path("api/health/", health_check, name="api-health"),
     path("healthz/", health_check, name="healthz"),
